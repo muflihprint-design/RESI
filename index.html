@@ -131,7 +131,7 @@
                                 <h3 class="text-xs font-black text-blue-600 uppercase">Data Penerima</h3>
                                 <div class="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">
                                     <span class="text-[9px] font-black text-blue-700">UKURAN FONT</span>
-                                    <input type="range" id="fontSizeScale" min="0.8" max="2.8" step="0.1" value="1.6" class="w-20" oninput="updatePreview()">
+                                    <input type="range" id="fontSizeScale" min="0.8" max="2.8" step="0.1" value="0.8" class="w-20" oninput="updatePreview()">
                                 </div>
                             </div>
                             <input type="text" id="receiverName" placeholder="Nama Penerima" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
@@ -407,9 +407,9 @@
                 doc.setFontSize(fontSize);
                 const splitName = doc.splitTextToSize(data.receiver.toUpperCase(), iw - (8 * baseScale));
                 // Hitung posisi Y agar teks nama tidak memotong label "PENERIMA"
-                currentY += (fontSize * 0.35); 
+                currentY += (fontSize * 0.25); 
                 doc.text(splitName, margin + (4 * baseScale), currentY);
-                currentY += (splitName.length * (fontSize * 0.42));
+                currentY += (splitName.length * (fontSize * 0.35));
             }
 
             // Phone
@@ -417,7 +417,7 @@
                 const fontSize = 13 * userScale * baseScale;
                 doc.setFontSize(fontSize);
                 doc.text(data.receiverPhone, margin + (4 * baseScale), currentY);
-                currentY += (fontSize * 0.45);
+                currentY += (fontSize * 0.38);
             }
 
             // Alamat
@@ -429,11 +429,11 @@
                 // Border garis samping alamat
                 doc.setLineWidth(0.6 * baseScale); 
                 const lineStart = currentY - (fontSize * 0.3);
-                const lineEnd = currentY + (splitAddr.length * fontSize * 0.45) - (fontSize * 0.3);
+                const lineEnd = currentY + (splitAddr.length * fontSize * 0.38) - (fontSize * 0.3);
                 doc.line(margin + (4 * baseScale), lineStart, margin + (4 * baseScale), lineEnd);
                 
                 doc.text(splitAddr, margin + (6 * baseScale), currentY);
-                currentY += (splitAddr.length * (fontSize * 0.45)) + (2 * baseScale);
+                currentY += (splitAddr.length * (fontSize * 0.25)) + (2 * baseScale);
             }
 
             // Divider Dashed
@@ -508,7 +508,10 @@
         }
 
         renderItemInputs();
-        setTimeout(updateUI, 100);
+setTimeout(() => {
+    updateUI();
+    updatePreview(); // Memastikan font merespon nilai 0.8 di awal
+}, 100);
     </script>
 </body>
 </html>
