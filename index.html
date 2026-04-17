@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Generator Resi Pro - Fixed Paper Dynamic Border</title>
+    <title>Generator Resi Pro - Adjusted Layout</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -39,9 +39,8 @@
             will-change: transform;
         }
 
-        /* Tampilan kertas tetap sesuai standar ukuran fisik */
         .paper-standard {
-            background: #f1f5f9; /* Warna abu-abu muda menandakan batas kertas fisik */
+            background: #f1f5f9;
             box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
             position: relative;
             padding: 12px; 
@@ -51,7 +50,7 @@
             overflow: hidden;
         }
 
-        /* Tinggi tetap sesuai standar */
+        /* Ukuran Kertas */
         .p-a6 { width: 320px; height: 450px; } 
         .l-a6 { width: 450px; height: 320px; }
         .p-a5 { width: 450px; height: 635px; }
@@ -59,26 +58,27 @@
         .p-a4 { width: 635px; height: 900px; }
         .l-a4 { width: 900px; height: 635px; }
 
-        /* Border hitam utama yang mengikuti tinggi konten */
         .dynamic-border-card {
             background: white;
             border: 1.5px solid #000;
             display: flex;
             flex-direction: column;
-            height: auto; /* Kunci: Tinggi otomatis mengikuti konten */
+            height: auto;
             width: 100%;
             box-sizing: border-box;
             transition: height 0.3s ease;
         }
 
-        /* Ukuran font berdasarkan skala kertas */
+        /* Ukuran Dasar Font */
         .p-a6, .l-a6 { font-size: 13px; }
         .p-a5, .l-a5 { font-size: 19px; }
         .p-a4, .l-a4 { font-size: 27px; }
 
-        #prevRecName { font-size: 1.6em; line-height: 1.1; margin-bottom: 3px; font-weight: 900; }
-        #prevRecPhone { font-size: 1.15em; font-weight: 900; margin-bottom: 3px; }
-        #prevRecAddress { font-size: 1.05em; line-height: 1.2; font-weight: 800; }
+        /* Styling Target Font Dinamis */
+        #prevRecName { line-height: 1; margin-top: 4px; margin-bottom: 2px; font-weight: 900; }
+        #prevRecPhone { font-weight: 900; margin-bottom: 2px; }
+        #prevRecAddress { line-height: 1.2; font-weight: 800; }
+        
         .item-text { font-size: 0.95em; line-height: 1.3; }
 
         .active-btn {
@@ -88,16 +88,19 @@
             box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
         }
 
-        .custom-btn {
-            @apply flex-1 py-4 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2 active:scale-95;
+        input[type="range"] {
+            @apply h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600;
         }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
     <div class="max-w-7xl mx-auto p-4 md:p-8">
-        <header class="mb-10">
-            <h1 class="text-4xl font-black text-slate-800 tracking-tighter italic">RESI <span class="text-blue-600">PRECISE</span></h1>
-                   </header>
+        <header class="mb-10 flex justify-between items-end">
+            <div>
+                <h1 class="text-4xl font-black text-slate-800 tracking-tighter italic">RESI <span class="text-blue-600">PRECISE</span></h1>
+                <p class="text-[10px] font-bold text-slate-400 uppercase">Solusi Label Pengiriman Profesional</p>
+            </div>
+        </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Panel Input -->
@@ -122,25 +125,34 @@
                     </div>
 
                     <div class="space-y-6">
+                        <!-- Data Penerima -->
                         <div class="space-y-3">
-                            <h3 class="text-xs font-black text-blue-600 uppercase">Data Penerima</h3>
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-xs font-black text-blue-600 uppercase">Data Penerima</h3>
+                                <div class="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">
+                                    <span class="text-[9px] font-black text-blue-700">UKURAN FONT</span>
+                                    <input type="range" id="fontSizeScale" min="0.8" max="2.8" step="0.1" value="1.6" class="w-20" oninput="updatePreview()">
+                                </div>
+                            </div>
                             <input type="text" id="receiverName" placeholder="Nama Penerima" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
                             <input type="tel" id="receiverPhone" placeholder="Nomor HP" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
                             <textarea id="receiverAddress" rows="2" placeholder="Alamat Lengkap..." class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner"></textarea>
                         </div>
 
+                        <!-- Data Pengirim -->
                         <div class="pt-6 border-t border-slate-100 space-y-3">
                             <div class="flex justify-between items-center">
                                 <h3 class="text-xs font-black text-slate-400 uppercase">Data Pengirim</h3>
                                 <div class="flex gap-1">
-                                    <button onclick="quickFill(1)" class="bg-slate-800 text-white text-[9px] px-2 py-1 rounded shadow-sm">MUFLIH</button>
-                                    <button onclick="quickFill(2)" class="bg-slate-800 text-white text-[9px] px-2 py-1 rounded shadow-sm">VI PRINT</button>
+                                    <button onclick="quickFill(1)" class="bg-slate-800 text-white text-[9px] px-2 py-1 rounded shadow-sm hover:bg-black transition-colors">MUFLIH</button>
+                                    <button onclick="quickFill(2)" class="bg-slate-800 text-white text-[9px] px-2 py-1 rounded shadow-sm hover:bg-black transition-colors">VI PRINT</button>
                                 </div>
                             </div>
                             <input type="text" id="senderName" placeholder="Nama Toko" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
                             <input type="tel" id="senderPhone" placeholder="WhatsApp" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
                         </div>
 
+                        <!-- Daftar Barang -->
                         <div class="pt-6 border-t border-slate-100">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="text-xs font-black text-slate-400 uppercase">Daftar Barang</h3>
@@ -151,32 +163,32 @@
                     </div>
 
                     <div class="flex gap-4 mt-8">
-    <button onclick="generateAndSharePDF('print')" 
-        class="group flex items-center justify-center gap-2 px-6 py-2.5 min-w-[120px] 
-               bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-600 
-               rounded-xl font-semibold text-sm tracking-wide
-               transition-all duration-300 ease-out
-               hover:bg-white hover:border-slate-400 hover:text-slate-900 hover:shadow-md
-               active:scale-95">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-        </svg>
-        CETAK
-    </button>
+                        <button onclick="generateAndSharePDF('print')" 
+                            class="group flex items-center justify-center gap-2 px-6 py-2.5 min-w-[120px] 
+                                   bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-600 
+                                   rounded-xl font-semibold text-sm tracking-wide
+                                   transition-all duration-300 ease-out
+                                   hover:bg-white hover:border-slate-400 hover:text-slate-900 hover:shadow-md
+                                   active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                            CETAK
+                        </button>
 
-    <button onclick="generateAndSharePDF('share')" 
-        class="group flex items-center justify-center gap-2 px-6 py-2.5 min-w-[120px] 
-               bg-gradient-to-br from-blue-600 to-indigo-700 text-white 
-               rounded-xl font-semibold text-sm tracking-wide shadow-lg shadow-blue-200/50
-               transition-all duration-300 ease-out
-               hover:from-blue-700 hover:to-indigo-800 hover:shadow-blue-300/60 hover:-translate-y-0.5
-               active:scale-95">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-        </svg>
-        BAGIKAN
-    </button>
-</div>
+                        <button onclick="generateAndSharePDF('share')" 
+                            class="group flex items-center justify-center gap-2 px-6 py-2.5 min-w-[120px] 
+                                   bg-gradient-to-br from-blue-600 to-indigo-700 text-white 
+                                   rounded-xl font-semibold text-sm tracking-wide shadow-lg shadow-blue-200/50
+                                   transition-all duration-300 ease-out
+                                   hover:from-blue-700 hover:to-indigo-800 hover:shadow-blue-300/60 hover:-translate-y-0.5
+                                   active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                            </svg>
+                            BAGIKAN
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -185,35 +197,36 @@
                 <div class="lg:sticky lg:top-8">
                     <div id="preview-window" class="preview-wrapper">
                         <div id="scaling-container">
-                            <!-- Container Kertas Fisik (Warna Abu-abu) -->
                             <div id="paper" class="paper-standard p-a6">
-                                <!-- Card dengan Border Hitam yang tingginya dinamis -->
                                 <div id="resiPreview" class="dynamic-border-card">
                                     <div class="p-4 flex flex-col h-full">
-                                        <div class="mb-3">
-                                            <div class="text-[0.55em] font-black text-black mb-0.5 uppercase">PENERIMA:</div>
+                                        <!-- Header Penerima Berbasis Flow -->
+                                        <div class="mb-4">
+                                            <div class="text-[0.55em] font-black text-black uppercase opacity-40">PENERIMA:</div>
                                             <div id="prevRecName" class="font-black uppercase"></div>
-                                            <div id="prevRecPhone" class="mb-0.5"></div>
-                                            <div id="prevRecAddress" class="border-l-2 border-black pl-3 uppercase"></div>
+                                            <div id="prevRecPhone"></div>
+                                            <div id="prevRecAddress" class="border-l-[3px] border-black pl-3 mt-1 uppercase"></div>
                                         </div>
 
+                                        <!-- Pengirim -->
                                         <div class="pt-2 border-t border-dashed border-black">
-                                            <div class="text-[0.5em] font-black text-black uppercase">PENGIRIM:</div>
+                                            <div class="text-[0.5em] font-black text-black uppercase opacity-40">PENGIRIM:</div>
                                             <div class="flex flex-wrap items-baseline gap-x-2">
                                                 <div id="prevSendName" class="font-bold text-black uppercase"></div>
                                                 <div id="prevSendPhone" class="text-[0.8em] text-black"></div>
                                             </div>
                                         </div>
 
+                                        <!-- Isi Paket -->
                                         <div id="prevTableArea" class="mt-4 border-t border-black pt-2">
-                                            <div class="text-[0.6em] font-black mb-1.5 uppercase tracking-tight text-black">Isi Paket:</div>
+                                            <div class="text-[0.6em] font-black mb-1.5 uppercase tracking-tight text-black opacity-40">Isi Paket:</div>
                                             <table class="w-full border-separate border-spacing-y-1">
                                                 <tbody id="prevItemsTable"></tbody>
                                             </table>
                                         </div>
 
-                                        <!-- Footer menempel di bawah konten terakhir -->
-                                        <div class="mt-4 border-t border-black pt-2 flex justify-between items-center bg-white pb-1">
+                                        <!-- Footer Label -->
+                                        <div class="mt-auto border-t border-black pt-2 flex justify-between items-center bg-white pb-1">
                                             <div class="text-[0.55em] font-black text-black uppercase" id="prevSizeLabel">A6 Potret</div>
                                             <div id="currentDate" class="text-[0.55em] font-bold text-black"></div>
                                         </div>
@@ -324,14 +337,26 @@
             });
         }
 
-        const basicInputs = ['senderName', 'senderPhone', 'receiverName', 'receiverPhone', 'receiverAddress'];
+        const basicInputs = ['senderName', 'senderPhone', 'receiverName', 'receiverPhone', 'receiverAddress', 'fontSizeScale'];
         basicInputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
 
         function updatePreview() {
-            document.getElementById('prevRecName').innerText = document.getElementById('receiverName').value;
-            document.getElementById('prevRecPhone').innerText = document.getElementById('receiverPhone').value;
-            document.getElementById('prevRecAddress').innerText = document.getElementById('receiverAddress').value;
-            document.getElementById('prevSendName').innerText = document.getElementById('senderName').value;
+            const userScale = parseFloat(document.getElementById('fontSizeScale').value);
+            
+            // Apply scale directly to fonts
+            const recName = document.getElementById('prevRecName');
+            const recPhone = document.getElementById('prevRecPhone');
+            const recAddr = document.getElementById('prevRecAddress');
+
+            recName.style.fontSize = `${userScale * 1.2}em`;
+            recPhone.style.fontSize = `${userScale * 0.85}em`;
+            recAddr.style.fontSize = `${userScale * 0.75}em`;
+
+            recName.innerText = document.getElementById('receiverName').value || 'NAMA PENERIMA';
+            recPhone.innerText = document.getElementById('receiverPhone').value;
+            recAddr.innerText = document.getElementById('receiverAddress').value;
+            
+            document.getElementById('prevSendName').innerText = document.getElementById('senderName').value || 'NAMA TOKO';
             const sPhone = document.getElementById('senderPhone').value;
             document.getElementById('prevSendPhone').innerText = sPhone ? `| ${sPhone}` : '';
             document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID');
@@ -347,14 +372,6 @@
             });
         }
 
-        function showToast(text) {
-            const msg = document.createElement('div');
-            msg.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full text-xs font-bold shadow-2xl z-50 animate-bounce";
-            msg.innerText = text;
-            document.body.appendChild(msg);
-            setTimeout(() => msg.remove(), 3000);
-        }
-
         async function generateAndSharePDF(mode = 'share') {
             const formats = { 'a6': [105, 148.5], 'a5': [148.5, 210], 'a4': [210, 297] };
             let [pdfW, pdfH] = formats[config.size];
@@ -363,90 +380,114 @@
             const doc = new jsPDF({ orientation: config.ori, unit: 'mm', format: config.size });
             const margin = 5; 
             const iw = pdfW - (margin * 2);
-            const scale = fontScales[config.size];
+            const baseScale = fontScales[config.size];
+            const userScale = parseFloat(document.getElementById('fontSizeScale').value);
 
             const data = {
                 sender: document.getElementById('senderName').value.trim() || 'Label',
                 senderPhone: document.getElementById('senderPhone').value.trim(),
-                receiver: document.getElementById('receiverName').value.trim() || 'Label',
+                receiver: document.getElementById('receiverName').value.trim() || 'Penerima',
                 receiverPhone: document.getElementById('receiverPhone').value.trim(),
                 address: document.getElementById('receiverAddress').value.trim()
             };
 
-            let currentY = margin + (5 * scale);
+            let currentY = margin + (5 * baseScale);
 
+            // Label "PENERIMA"
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(6 * scale);
-            doc.text("PENERIMA:", margin + (4 * scale), currentY);
-            currentY += (5 * scale);
+            doc.setFontSize(6 * baseScale);
+            doc.setTextColor(150, 150, 150);
+            doc.text("PENERIMA:", margin + (4 * baseScale), currentY);
+            doc.setTextColor(0, 0, 0);
+            currentY += (2 * baseScale); // Gap kecil ke nama agar tidak menimpa
 
+            // Nama Penerima
             if (data.receiver) {
-                doc.setFontSize(15 * scale);
-                const splitName = doc.splitTextToSize(data.receiver.toUpperCase(), iw - (8 * scale));
-                doc.text(splitName, margin + (4 * scale), currentY);
-                currentY += (splitName.length * (7 * scale));
+                const fontSize = 14 * userScale * baseScale;
+                doc.setFontSize(fontSize);
+                const splitName = doc.splitTextToSize(data.receiver.toUpperCase(), iw - (8 * baseScale));
+                // Hitung posisi Y agar teks nama tidak memotong label "PENERIMA"
+                currentY += (fontSize * 0.35); 
+                doc.text(splitName, margin + (4 * baseScale), currentY);
+                currentY += (splitName.length * (fontSize * 0.42));
             }
+
+            // Phone
             if (data.receiverPhone) {
-                doc.setFontSize(11 * scale);
-                doc.text(data.receiverPhone, margin + (4 * scale), currentY);
-                currentY += (6 * scale);
+                const fontSize = 10 * userScale * baseScale;
+                doc.setFontSize(fontSize);
+                doc.text(data.receiverPhone, margin + (4 * baseScale), currentY);
+                currentY += (fontSize * 0.45);
             }
+
+            // Alamat
             if (data.address) {
-                doc.setFontSize(10 * scale);
-                const splitAddr = doc.splitTextToSize(data.address.toUpperCase(), iw - (12 * scale));
-                doc.setLineWidth(0.5 * scale); 
-                doc.line(margin + (4 * scale), currentY - (3 * scale), margin + (4 * scale), currentY + (splitAddr.length * 4.5 * scale) - (3 * scale));
-                doc.text(splitAddr, margin + (6 * scale), currentY);
-                currentY += (splitAddr.length * (4.5 * scale)) + (0.5 * scale);
+                const fontSize = 9 * userScale * baseScale;
+                doc.setFontSize(fontSize);
+                const splitAddr = doc.splitTextToSize(data.address.toUpperCase(), iw - (12 * baseScale));
+                
+                // Border garis samping alamat
+                doc.setLineWidth(0.6 * baseScale); 
+                const lineStart = currentY - (fontSize * 0.3);
+                const lineEnd = currentY + (splitAddr.length * fontSize * 0.45) - (fontSize * 0.3);
+                doc.line(margin + (4 * baseScale), lineStart, margin + (4 * baseScale), lineEnd);
+                
+                doc.text(splitAddr, margin + (6 * baseScale), currentY);
+                currentY += (splitAddr.length * (fontSize * 0.45)) + (2 * baseScale);
             }
 
-            currentY += (0.5 * scale);
-            doc.setLineWidth(0.15 * scale); 
+            // Divider Dashed
+            doc.setLineWidth(0.15 * baseScale); 
             doc.setLineDashPattern([2, 1], 0);
-            doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
+            doc.line(margin + (4 * baseScale), currentY, pdfW - margin - (4 * baseScale), currentY);
             doc.setLineDashPattern([], 0);
-            currentY += (3 * scale);
+            currentY += (4 * baseScale);
 
-            doc.setFontSize(6 * scale);
-            doc.text("PENGIRIM:", margin + (4 * scale), currentY);
-            currentY += (4 * scale);
+            // Pengirim
+            doc.setFontSize(6 * baseScale);
+            doc.setTextColor(150, 150, 150);
+            doc.text("PENGIRIM:", margin + (4 * baseScale), currentY);
+            doc.setTextColor(0, 0, 0);
+            currentY += (4 * baseScale);
 
-            doc.setFontSize(8.5 * scale);
-            doc.text(`${data.sender.toUpperCase()} ${data.senderPhone ? '| '+data.senderPhone : ''}`, margin + (4 * scale), currentY);
-            currentY += (3 * scale);
+            doc.setFontSize(8.5 * baseScale);
+            doc.text(`${data.sender.toUpperCase()} ${data.senderPhone ? '| '+data.senderPhone : ''}`, margin + (4 * baseScale), currentY);
+            currentY += (4 * baseScale);
 
+            // Daftar Barang
             const validItems = items.filter(i => i.name.trim() !== "");
             if (validItems.length > 0) {
-                currentY += (0.5 * scale);
-                doc.setLineWidth(0.15 * scale); 
-                doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
-                currentY += (3 * scale);
+                doc.setLineWidth(0.15 * baseScale); 
+                doc.line(margin + (4 * baseScale), currentY, pdfW - margin - (4 * baseScale), currentY);
+                currentY += (4 * baseScale);
                 
-                doc.setFontSize(6.5 * scale);
-                doc.text("ISI PAKET:", margin + (4 * scale), currentY);
-                currentY += (4 * scale);
+                doc.setFontSize(6.5 * baseScale);
+                doc.setTextColor(150, 150, 150);
+                doc.text("ISI PAKET:", margin + (4 * baseScale), currentY);
+                doc.setTextColor(0, 0, 0);
+                currentY += (4 * baseScale);
                 
                 validItems.forEach(item => {
-                    doc.setFontSize(9 * scale);
+                    doc.setFontSize(9 * baseScale);
                     doc.setFont("helvetica", "normal");
-                    doc.text(item.name.toUpperCase(), margin + (4 * scale), currentY);
+                    doc.text(item.name.toUpperCase(), margin + (4 * baseScale), currentY);
                     doc.setFont("helvetica", "bold");
-                    doc.text(item.qty, pdfW - margin - (6 * scale), currentY, { align: 'right' });
-                    currentY += (5.0 * scale);
+                    doc.text(item.qty, pdfW - margin - (6 * baseScale), currentY, { align: 'right' });
+                    currentY += (5.5 * baseScale);
                 });
             }
 
-            // Garis bawah penutup dan keterangan
-            currentY += (0.2 * scale);
-            doc.setLineWidth(0.15 * scale); 
-            doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
-            currentY += (2 * scale);
-            doc.setFontSize(5 * scale);
-            doc.text(`RESI PRECISE - ${config.size.toUpperCase()} - ${new Date().toLocaleDateString('id-ID')}`, margin + (4 * scale), currentY);
+            // Footer
+            currentY += (2 * baseScale);
+            doc.setLineWidth(0.15 * baseScale); 
+            doc.line(margin + (4 * baseScale), currentY, pdfW - margin - (4 * baseScale), currentY);
+            currentY += (3 * baseScale);
+            doc.setFontSize(5 * baseScale);
+            doc.text(`RESI PRECISE - ${config.size.toUpperCase()} - ${new Date().toLocaleDateString('id-ID')}`, margin + (4 * baseScale), currentY);
 
-            // Kotak utama (Dynamic Height Border)
-            const boxHeight = currentY + (3 * scale) - margin;
-            doc.setLineWidth(0.25 * scale); 
+            // Border Luar (Dynamic Height)
+            const boxHeight = currentY + (3 * baseScale) - margin;
+            doc.setLineWidth(0.3 * baseScale); 
             doc.rect(margin, margin, iw, boxHeight);
 
             const fileName = `Resi_${data.receiver}.pdf`;
@@ -454,12 +495,6 @@
             if (mode === 'print') {
                 doc.autoPrint();
                 window.open(doc.output('bloburl'), '_blank');
-                return;
-            }
-
-            if (mode === 'download') {
-                doc.save(fileName);
-                showToast("Berhasil mengunduh PDF");
                 return;
             }
 
