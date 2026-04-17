@@ -437,10 +437,10 @@
             }
 
             // Garis bawah penutup dan keterangan
-            currentY += (0.5 * scale);
+            currentY += (0.2 * scale);
             doc.setLineWidth(0.15 * scale); 
             doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
-            currentY += (5 * scale);
+            currentY += (2 * scale);
             doc.setFontSize(5 * scale);
             doc.text(`RESI PRECISE - ${config.size.toUpperCase()} - ${new Date().toLocaleDateString('id-ID')}`, margin + (4 * scale), currentY);
 
