@@ -17,7 +17,7 @@
         
         .preview-wrapper {
             width: 100%;
-            height: calc(100vh - 150px); /* Menentukan tinggi tetap berdasarkan layar */
+            height: calc(100vh - 150px);
             min-height: 500px;
             display: flex;
             justify-content: center;
@@ -51,13 +51,9 @@
             min-height: fit-content;
         }
 
-        /* Ukuran Dasar Kertas untuk Perhitungan Skala */
-        .p-a6 { width: 320px; min-height: 450px; } 
-        .l-a6 { width: 450px; min-height: 320px; }
-        .p-a5 { width: 450px; min-height: 635px; }
-        .l-a5 { width: 635px; min-height: 450px; }
-        .p-a4 { width: 635px; min-height: 900px; }
-        .l-a4 { width: 900px; min-height: 635px; }
+        /* Ukuran Dasar Kertas A6 */
+        .p-a6 { width: 320px; min-height: 450px; font-size: 13px; } 
+        .l-a6 { width: 450px; min-height: 320px; font-size: 13px; }
 
         .preview-card {
             background: white;
@@ -69,10 +65,6 @@
             box-sizing: border-box;
             overflow: visible;
         }
-
-        .p-a6, .l-a6 { font-size: 13px; }
-        .p-a5, .l-a5 { font-size: 19px; }
-        .p-a4, .l-a4 { font-size: 27px; }
 
         #prevRecName { font-size: 1.6em; line-height: 1.1; margin-bottom: 3px; font-weight: 900; }
         #prevRecPhone { font-size: 1.15em; font-weight: 900; margin-bottom: 3px; }
@@ -91,28 +83,18 @@
     <div class="max-w-7xl mx-auto p-4 md:p-8">
         <header class="mb-10">
             <h1 class="text-4xl font-black text-slate-800 tracking-tighter italic">RESI <span class="text-blue-600">PRECISE</span></h1>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Sistem Label dengan Skala Ekstra Besar</p>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Sistem Label Pengiriman A6 Pro</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Panel Input -->
             <div class="lg:col-span-5 space-y-6">
                 <div class="bg-white p-6 rounded-[2rem] shadow-xl border border-slate-200">
-                    <div class="grid grid-cols-2 gap-4 mb-8">
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase block mb-2">Ukuran Kertas</label>
-                            <div class="flex bg-slate-100 p-1 rounded-xl">
-                                <button onclick="setSize('a6')" id="btn-a6" class="size-btn flex-1 py-2 rounded-lg text-xs font-black active-btn">A6</button>
-                                <button onclick="setSize('a5')" id="btn-a5" class="size-btn flex-1 py-2 rounded-lg text-xs font-black">A5</button>
-                                <button onclick="setSize('a4')" id="btn-a4" class="size-btn flex-1 py-2 rounded-lg text-xs font-black">A4</button>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase block mb-2">Orientasi</label>
-                            <div class="flex bg-slate-100 p-1 rounded-xl">
-                                <button onclick="setOrientation('p')" id="btn-p" class="ori-btn flex-1 py-2 rounded-lg text-xs font-black active-btn">P</button>
-                                <button onclick="setOrientation('l')" id="btn-l" class="ori-btn flex-1 py-2 rounded-lg text-xs font-black">L</button>
-                            </div>
+                    <div class="mb-8">
+                        <label class="text-[10px] font-black text-slate-400 uppercase block mb-2 text-center">Orientasi Resi A6</label>
+                        <div class="flex bg-slate-100 p-1 rounded-xl max-w-[200px] mx-auto">
+                            <button onclick="setOrientation('p')" id="btn-p" class="ori-btn flex-1 py-2 rounded-lg text-xs font-black active-btn">POTRET</button>
+                            <button onclick="setOrientation('l')" id="btn-l" class="ori-btn flex-1 py-2 rounded-lg text-xs font-black">LANSKAP</button>
                         </div>
                     </div>
 
@@ -202,14 +184,11 @@
 
     <script>
         const { jsPDF } = window.jspdf;
+        // Hanya A6 yang tersedia sekarang
         let config = { size: 'a6', ori: 'p' };
         let items = [{ name: '', qty: '' }];
         
-        const fontScales = { 
-            'a6': 1.0, 
-            'a5': 1.6,
-            'a4': 2.5 
-        };
+        const fontScales = { 'a6': 1.0 };
 
         const quickData = {
             1: { name: "MUFLIH STORE", contact: "081574009621" },
@@ -223,27 +202,20 @@
             updatePreview();
         }
 
-        function setSize(s) {
-            config.size = s;
-            updateUI();
-        }
-
         function setOrientation(o) {
             config.ori = o;
             updateUI();
         }
 
         function updateUI() {
-            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active-btn'));
             document.querySelectorAll('.ori-btn').forEach(b => b.classList.remove('active-btn'));
-            document.getElementById(`btn-${config.size}`).classList.add('active-btn');
             document.getElementById(`btn-${config.ori}`).classList.add('active-btn');
 
             const paper = document.getElementById('paper');
-            paper.className = `paper-border ${config.ori}-${config.size}`;
+            paper.className = `paper-border ${config.ori}-a6`;
             
             const oriLabel = config.ori === 'p' ? 'Potret' : 'Lanskap';
-            document.getElementById('prevSizeLabel').innerText = `${config.size.toUpperCase()} ${oriLabel}`;
+            document.getElementById('prevSizeLabel').innerText = `A6 ${oriLabel}`;
             
             setTimeout(adjustScale, 10);
             updatePreview();
@@ -254,7 +226,6 @@
             const paper = document.getElementById('paper');
             const scalingGroup = document.getElementById('scaling-container');
             
-            // Memberikan padding aman agar kertas tidak menempel ke batas kontainer
             const safePadding = 40;
             const contWidth = container.offsetWidth - safePadding;
             const contHeight = container.offsetHeight - safePadding;
@@ -262,14 +233,10 @@
             const paperWidth = paper.offsetWidth;
             const paperHeight = paper.offsetHeight;
 
-            // Logika baru: Prioritaskan agar tinggi kertas pas dengan tinggi kontainer (Fit-to-Height)
-            // Namun tetap memastikan lebar tidak melebihi kontainer
             const scaleX = contWidth / paperWidth;
             const scaleY = contHeight / paperHeight;
             
-            // Gunakan skala terkecil di antara lebar dan tinggi untuk memastikan seluruh kertas terlihat
             const finalScale = Math.min(scaleX, scaleY);
-
             scalingGroup.style.transform = `scale(${finalScale})`;
         }
 
@@ -329,19 +296,18 @@
                 tableBody.appendChild(tr);
             });
             
-            // Sesuaikan skala kembali jika konten berubah
             setTimeout(adjustScale, 10);
         }
 
         async function generateAndSharePDF() {
-            const formats = { 'a6': [105, 148.5], 'a5': [148.5, 210], 'a4': [210, 297] };
-            let [pdfW, pdfH] = formats[config.size];
+            const a6Size = [105, 148.5];
+            let [pdfW, pdfH] = a6Size;
             if(config.ori === 'l') [pdfW, pdfH] = [pdfH, pdfW];
 
-            const doc = new jsPDF({ orientation: config.ori, unit: 'mm', format: config.size });
+            const doc = new jsPDF({ orientation: config.ori, unit: 'mm', format: 'a6' });
             const margin = 5; 
             const iw = pdfW - (margin * 2);
-            const scale = fontScales[config.size];
+            const scale = 1.0; // Skala font tetap untuk A6
 
             const data = {
                 sender: document.getElementById('senderName').value.trim() || 'Label',
@@ -416,7 +382,7 @@
 
             const footerY = pdfH - margin - (3 * scale);
             doc.setFontSize(5 * scale);
-            doc.text(`RESI PRECISE - ${config.size.toUpperCase()} - ${new Date().toLocaleDateString('id-ID')}`, margin + (4 * scale), footerY);
+            doc.text(`RESI PRECISE A6 - ${new Date().toLocaleDateString('id-ID')}`, margin + (4 * scale), footerY);
 
             doc.setLineWidth(0.1); 
             doc.rect(margin, margin, iw, pdfH - (margin * 2));
