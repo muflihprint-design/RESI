@@ -330,7 +330,7 @@
                 div.className = 'flex gap-2 items-center';
                 div.innerHTML = `
                     <input type="text" value="${item.name}" oninput="updateItem(${index}, 'name', this.value)" placeholder="Nama Barang" class="flex-1 p-2 bg-slate-50 rounded-lg text-xs outline-none">
-                    <input type="text" value="${item.qty}" oninput="updateItem(${index}, 'qty', this.value)" placeholder="Qty" class="w-10 p-2 bg-slate-50 rounded-lg text-xs text-center font-bold outline-none">
+                    <input type="text" value="${item.qty}" oninput="updateItem(${index}, 'qty', this.value)" placeholder="Qty" class="w-20 p-2 bg-slate-50 rounded-lg text-xs text-center font-bold outline-none">
                     <button onclick="removeItem(${index})" class="text-slate-300 hover:text-red-500 text-lg">&times;</button>
                 `;
                 container.appendChild(div);
