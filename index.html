@@ -330,7 +330,7 @@
                 div.className = 'flex gap-2 items-center';
                 div.innerHTML = `
                     <input type="text" value="${item.name}" oninput="updateItem(${index}, 'name', this.value)" placeholder="Nama Barang" class="flex-1 p-2 bg-slate-50 rounded-lg text-xs outline-none">
-                    <input type="text" value="${item.qty}" oninput="updateItem(${index}, 'qty', this.value)" placeholder="Qty" class="w-20 p-2 bg-slate-50 rounded-lg text-xs text-center font-bold outline-none">
+                    <input type="text" value="${item.qty}" oninput="updateItem(${index}, 'qty', this.value)" placeholder="Qty" class="w-15 p-2 bg-slate-50 rounded-lg text-xs text-center font-bold outline-none">
                     <button onclick="removeItem(${index})" class="text-slate-300 hover:text-red-500 text-lg">&times;</button>
                 `;
                 container.appendChild(div);
@@ -457,33 +457,47 @@
             // Daftar Barang
             const validItems = items.filter(i => i.name.trim() !== "");
             if (validItems.length > 0) {
-                doc.setLineWidth(0.15 * baseScale); 
-                doc.line(margin + (4 * baseScale), currentY, pdfW - margin - (4 * baseScale), currentY);
-                currentY += (4 * baseScale);
-                
-                doc.setFontSize(6.5 * baseScale);
-                doc.setTextColor(150, 150, 150);
-                doc.text("ISI PAKET:", margin + (4 * baseScale), currentY);
-                doc.setTextColor(0, 0, 0);
-                currentY += (4 * baseScale);
-                
-                validItems.forEach(item => {
-                    doc.setFontSize(9 * baseScale);
-                    doc.setFont("helvetica", "normal");
-                    doc.text(item.name.toUpperCase(), margin + (4 * baseScale), currentY);
-                    doc.setFont("helvetica", "bold");
-                    doc.text(item.qty, pdfW - margin - (6 * baseScale), currentY, { align: 'right' });
-                    currentY += (5 * baseScale);
-                });
-            }
+    // 1. Garis Atas (Pembatas Label Isi Paket)
+    doc.setLineWidth(0.15 * baseScale); 
+    doc.line(margin + (4 * baseScale), currentY, pdfW - margin - (4 * baseScale), currentY);
+    
+    // JARAK DIRAPATKAN: Dari 4 ke 2.5 agar teks "ISI PAKET" dekat ke garis
+    currentY += (2.5 * baseScale); 
+    
+    doc.setFontSize(6.5 * baseScale);
+    doc.setTextColor(150, 150, 150);
+    doc.text("ISI PAKET:", margin + (4 * baseScale), currentY);
+    doc.setTextColor(0, 0, 0);
 
-            // Footer
-            currentY += (0.2 * baseScale);
-            doc.setLineWidth(0.15 * baseScale); 
-            doc.line(margin + (4 * baseScale), currentY, pdfW - margin - (4 * baseScale), currentY);
-            currentY += (3 * baseScale);
-            doc.setFontSize(5 * baseScale);
-            doc.text(`RESI PRECISE - ${config.size.toUpperCase()} - ${new Date().toLocaleDateString('id-ID')}`, margin + (4 * baseScale), currentY);
+    // JARAK DIRAPATKAN: Dari 4 ke 3 agar item pertama dekat dengan judul "ISI PAKET"
+    currentY += (3 * baseScale); 
+    
+    validItems.forEach(item => {
+        doc.setFontSize(9 * baseScale);
+        doc.setFont("helvetica", "normal");
+        
+        // Tulis Nama Barang
+        doc.text(item.name.toUpperCase(), margin + (4 * baseScale), currentY);
+        
+        // Tulis Qty
+        doc.setFont("helvetica", "bold");
+        doc.text(item.qty, pdfW - margin - (6 * baseScale), currentY, { align: 'right' });
+        
+        // JARAK ANTAR BARIS BARANG: Dari 4 ke 3.5 (Sangat rapat tapi tidak bertumpuk)
+        currentY += (3.5 * baseScale); 
+    });
+}
+
+// Footer
+// JARAK DIRAPATKAN: Menghilangkan penambahan currentY yang tidak perlu sebelum garis footer
+doc.setLineWidth(0.15 * baseScale); 
+doc.line(margin + (4 * baseScale), currentY, pdfW - margin - (4 * baseScale), currentY);
+
+// JARAK KE TEKS FOOTER: Dari 3 ke 2.2
+currentY += (2.2 * baseScale); 
+doc.setFontSize(5 * baseScale);
+doc.setTextColor(120, 120, 120); // Sedikit abu-abu agar footer tidak mencolok
+doc.text(`RESI PRECISE - ${config.size.toUpperCase()} - ${new Date().toLocaleDateString('id-ID')}`, margin + (4 * baseScale), currentY);
 
             // Border Luar (Dynamic Height)
             const boxHeight = currentY + (3 * baseScale) - margin;
