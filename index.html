@@ -473,12 +473,12 @@
                     doc.text(item.name.toUpperCase(), margin + (4 * baseScale), currentY);
                     doc.setFont("helvetica", "bold");
                     doc.text(item.qty, pdfW - margin - (6 * baseScale), currentY, { align: 'right' });
-                    currentY += (5.5 * baseScale);
+                    currentY += (5 * baseScale);
                 });
             }
 
             // Footer
-            currentY += (2 * baseScale);
+            currentY += (0.5 * baseScale);
             doc.setLineWidth(0.15 * baseScale); 
             doc.line(margin + (4 * baseScale), currentY, pdfW - margin - (4 * baseScale), currentY);
             currentY += (3 * baseScale);
