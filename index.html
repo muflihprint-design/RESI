@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Generator Resi Pro - Skala Maksimal</title>
+    <title>Generator Resi Pro - Fixed Paper Dynamic Border</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -39,32 +39,42 @@
             will-change: transform;
         }
 
-        .paper-border {
-            background: white;
+        /* Tampilan kertas tetap sesuai standar ukuran fisik */
+        .paper-standard {
+            background: #f1f5f9; /* Warna abu-abu muda menandakan batas kertas fisik */
             box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
             position: relative;
             padding: 12px; 
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
-            height: auto;
-            min-height: fit-content;
+            overflow: hidden;
         }
 
-        /* Ukuran Dasar Kertas A6 */
-        .p-a6 { width: 320px; min-height: 450px; font-size: 13px; } 
-        .l-a6 { width: 450px; min-height: 320px; font-size: 13px; }
+        /* Tinggi tetap sesuai standar */
+        .p-a6 { width: 320px; height: 450px; } 
+        .l-a6 { width: 450px; height: 320px; }
+        .p-a5 { width: 450px; height: 635px; }
+        .l-a5 { width: 635px; height: 450px; }
+        .p-a4 { width: 635px; height: 900px; }
+        .l-a4 { width: 900px; height: 635px; }
 
-        .preview-card {
+        /* Border hitam utama yang mengikuti tinggi konten */
+        .dynamic-border-card {
             background: white;
-            border: 1px solid #000;
+            border: 1.5px solid #000;
             display: flex;
             flex-direction: column;
-            height: auto;
+            height: auto; /* Kunci: Tinggi otomatis mengikuti konten */
             width: 100%;
             box-sizing: border-box;
-            overflow: visible;
+            transition: height 0.3s ease;
         }
+
+        /* Ukuran font berdasarkan skala kertas */
+        .p-a6, .l-a6 { font-size: 13px; }
+        .p-a5, .l-a5 { font-size: 19px; }
+        .p-a4, .l-a4 { font-size: 27px; }
 
         #prevRecName { font-size: 1.6em; line-height: 1.1; margin-bottom: 3px; font-weight: 900; }
         #prevRecPhone { font-size: 1.15em; font-weight: 900; margin-bottom: 3px; }
@@ -77,33 +87,47 @@
             border-color: #1e40af !important;
             box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
         }
+
+        .custom-btn {
+            @apply flex-1 py-4 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2 active:scale-95;
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
     <div class="max-w-7xl mx-auto p-4 md:p-8">
         <header class="mb-10">
             <h1 class="text-4xl font-black text-slate-800 tracking-tighter italic">RESI <span class="text-blue-600">PRECISE</span></h1>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Sistem Label Pengiriman A6 Pro</p>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Smart Scaling: Border Mengikuti Konten di Atas Kertas Tetap</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Panel Input -->
             <div class="lg:col-span-5 space-y-6">
                 <div class="bg-white p-6 rounded-[2rem] shadow-xl border border-slate-200">
-                    <div class="mb-8">
-                        <label class="text-[10px] font-black text-slate-400 uppercase block mb-2 text-center">Orientasi Resi A6</label>
-                        <div class="flex bg-slate-100 p-1 rounded-xl max-w-[200px] mx-auto">
-                            <button onclick="setOrientation('p')" id="btn-p" class="ori-btn flex-1 py-2 rounded-lg text-xs font-black active-btn">POTRET</button>
-                            <button onclick="setOrientation('l')" id="btn-l" class="ori-btn flex-1 py-2 rounded-lg text-xs font-black">LANSKAP</button>
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase block mb-2">Ukuran Kertas</label>
+                            <div class="flex bg-slate-100 p-1 rounded-xl">
+                                <button onclick="setSize('a6')" id="btn-a6" class="size-btn flex-1 py-2 rounded-lg text-xs font-black active-btn">A6</button>
+                                <button onclick="setSize('a5')" id="btn-a5" class="size-btn flex-1 py-2 rounded-lg text-xs font-black">A5</button>
+                                <button onclick="setSize('a4')" id="btn-a4" class="size-btn flex-1 py-2 rounded-lg text-xs font-black">A4</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase block mb-2">Orientasi</label>
+                            <div class="flex bg-slate-100 p-1 rounded-xl">
+                                <button onclick="setOrientation('p')" id="btn-p" class="ori-btn flex-1 py-2 rounded-lg text-xs font-black active-btn">P</button>
+                                <button onclick="setOrientation('l')" id="btn-l" class="ori-btn flex-1 py-2 rounded-lg text-xs font-black">L</button>
+                            </div>
                         </div>
                     </div>
 
                     <div class="space-y-6">
                         <div class="space-y-3">
                             <h3 class="text-xs font-black text-blue-600 uppercase">Data Penerima</h3>
-                            <input type="text" id="receiverName" placeholder="Nama Lengkap" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
+                            <input type="text" id="receiverName" placeholder="Nama Penerima" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
                             <input type="tel" id="receiverPhone" placeholder="Nomor HP" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
-                            <textarea id="receiverAddress" rows="2" placeholder="Alamat Pengiriman Lengkap..." class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner"></textarea>
+                            <textarea id="receiverAddress" rows="2" placeholder="Alamat Lengkap..." class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner"></textarea>
                         </div>
 
                         <div class="pt-6 border-t border-slate-100 space-y-3">
@@ -114,8 +138,8 @@
                                     <button onclick="quickFill(2)" class="bg-slate-800 text-white text-[9px] px-2 py-1 rounded shadow-sm">VI PRINT</button>
                                 </div>
                             </div>
-                            <input type="text" id="senderName" placeholder="Nama Toko/Pengirim" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
-                            <input type="tel" id="senderPhone" placeholder="WhatsApp Pengirim" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
+                            <input type="text" id="senderName" placeholder="Nama Toko" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
+                            <input type="tel" id="senderPhone" placeholder="WhatsApp" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 shadow-inner">
                         </div>
 
                         <div class="pt-6 border-t border-slate-100">
@@ -127,12 +151,14 @@
                         </div>
                     </div>
 
-                    <button id="btnShare" onclick="generateAndSharePDF()" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-[1.5rem] shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-3 active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                        </svg>
-                        BAGIKAN PDF
-                    </button>
+                    <div class="flex gap-3 mt-8">
+                        <button onclick="generateAndSharePDF('download')" class="custom-btn bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm">
+                            UNDUH PDF
+                        </button>
+                        <button onclick="generateAndSharePDF('share')" class="custom-btn bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-100">
+                            BAGIKAN
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -141,17 +167,19 @@
                 <div class="lg:sticky lg:top-8">
                     <div id="preview-window" class="preview-wrapper">
                         <div id="scaling-container">
-                            <div id="paper" class="paper-border p-a6">
-                                <div id="resiPreview" class="preview-card">
-                                    <div class="content-wrapper p-4">
-                                        <div class="mb-3 shrink-0">
+                            <!-- Container Kertas Fisik (Warna Abu-abu) -->
+                            <div id="paper" class="paper-standard p-a6">
+                                <!-- Card dengan Border Hitam yang tingginya dinamis -->
+                                <div id="resiPreview" class="dynamic-border-card">
+                                    <div class="p-4 flex flex-col h-full">
+                                        <div class="mb-3">
                                             <div class="text-[0.55em] font-black text-black mb-0.5 uppercase">PENERIMA:</div>
                                             <div id="prevRecName" class="font-black uppercase"></div>
                                             <div id="prevRecPhone" class="mb-0.5"></div>
                                             <div id="prevRecAddress" class="border-l-2 border-black pl-3 uppercase"></div>
                                         </div>
 
-                                        <div class="pt-2 border-t border-dashed border-black shrink-0">
+                                        <div class="pt-2 border-t border-dashed border-black">
                                             <div class="text-[0.5em] font-black text-black uppercase">PENGIRIM:</div>
                                             <div class="flex flex-wrap items-baseline gap-x-2">
                                                 <div id="prevSendName" class="font-bold text-black uppercase"></div>
@@ -159,19 +187,18 @@
                                             </div>
                                         </div>
 
-                                        <div id="prevTableArea" class="mt-4 border-t border-black pt-2 flex flex-col">
+                                        <div id="prevTableArea" class="mt-4 border-t border-black pt-2">
                                             <div class="text-[0.6em] font-black mb-1.5 uppercase tracking-tight text-black">Isi Paket:</div>
-                                            <div class="scrollable-items">
-                                                <table class="w-full border-separate border-spacing-y-1">
-                                                    <tbody id="prevItemsTable"></tbody>
-                                                </table>
-                                            </div>
+                                            <table class="w-full border-separate border-spacing-y-1">
+                                                <tbody id="prevItemsTable"></tbody>
+                                            </table>
                                         </div>
-                                    </div>
 
-                                    <div class="mt-auto border-t border-black px-3 py-2 flex justify-between items-center bg-white shrink-0">
-                                        <div class="text-[0.55em] font-black text-black uppercase" id="prevSizeLabel">A6 Potret</div>
-                                        <div id="currentDate" class="text-[0.55em] font-bold text-black"></div>
+                                        <!-- Footer menempel di bawah konten terakhir -->
+                                        <div class="mt-4 border-t border-black pt-2 flex justify-between items-center bg-white pb-1">
+                                            <div class="text-[0.55em] font-black text-black uppercase" id="prevSizeLabel">A6 Potret</div>
+                                            <div id="currentDate" class="text-[0.55em] font-bold text-black"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -184,12 +211,10 @@
 
     <script>
         const { jsPDF } = window.jspdf;
-        // Hanya A6 yang tersedia sekarang
         let config = { size: 'a6', ori: 'p' };
         let items = [{ name: '', qty: '' }];
         
-        const fontScales = { 'a6': 1.0 };
-
+        const fontScales = { 'a6': 1.0, 'a5': 1.6, 'a4': 2.5 };
         const quickData = {
             1: { name: "MUFLIH STORE", contact: "081574009621" },
             2: { name: "VI PRINT CENTER", contact: "085823253354" }
@@ -202,22 +227,29 @@
             updatePreview();
         }
 
+        function setSize(s) {
+            config.size = s;
+            updateUI();
+        }
+
         function setOrientation(o) {
             config.ori = o;
             updateUI();
         }
 
         function updateUI() {
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active-btn'));
             document.querySelectorAll('.ori-btn').forEach(b => b.classList.remove('active-btn'));
+            document.getElementById(`btn-${config.size}`).classList.add('active-btn');
             document.getElementById(`btn-${config.ori}`).classList.add('active-btn');
 
             const paper = document.getElementById('paper');
-            paper.className = `paper-border ${config.ori}-a6`;
+            paper.className = `paper-standard ${config.ori}-${config.size}`;
             
             const oriLabel = config.ori === 'p' ? 'Potret' : 'Lanskap';
-            document.getElementById('prevSizeLabel').innerText = `A6 ${oriLabel}`;
+            document.getElementById('prevSizeLabel').innerText = `${config.size.toUpperCase()} ${oriLabel}`;
             
-            setTimeout(adjustScale, 10);
+            setTimeout(adjustScale, 50);
             updatePreview();
         }
 
@@ -266,8 +298,8 @@
                 const div = document.createElement('div');
                 div.className = 'flex gap-2 items-center';
                 div.innerHTML = `
-                    <input type="text" value="${item.name}" oninput="updateItem(${index}, 'name', this.value)" placeholder="Barang" class="flex-1 p-2 bg-slate-50 rounded-lg text-xs outline-none">
-                    <input type="text" value="${item.qty}" oninput="updateItem(${index}, 'qty', this.value)" placeholder="Q" class="w-8 p-2 bg-slate-50 rounded-lg text-xs text-center font-bold outline-none">
+                    <input type="text" value="${item.name}" oninput="updateItem(${index}, 'name', this.value)" placeholder="Nama Barang" class="flex-1 p-2 bg-slate-50 rounded-lg text-xs outline-none">
+                    <input type="text" value="${item.qty}" oninput="updateItem(${index}, 'qty', this.value)" placeholder="Qty" class="w-10 p-2 bg-slate-50 rounded-lg text-xs text-center font-bold outline-none">
                     <button onclick="removeItem(${index})" class="text-slate-300 hover:text-red-500 text-lg">&times;</button>
                 `;
                 container.appendChild(div);
@@ -295,19 +327,25 @@
                 tr.innerHTML = `<td class="py-0.5 item-text text-black uppercase font-medium">${item.name}</td><td class="text-right py-0.5 font-black item-text text-black">${item.qty}</td>`;
                 tableBody.appendChild(tr);
             });
-            
-            setTimeout(adjustScale, 10);
         }
 
-        async function generateAndSharePDF() {
-            const a6Size = [105, 148.5];
-            let [pdfW, pdfH] = a6Size;
+        function showToast(text) {
+            const msg = document.createElement('div');
+            msg.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full text-xs font-bold shadow-2xl z-50 animate-bounce";
+            msg.innerText = text;
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 3000);
+        }
+
+        async function generateAndSharePDF(mode = 'share') {
+            const formats = { 'a6': [105, 148.5], 'a5': [148.5, 210], 'a4': [210, 297] };
+            let [pdfW, pdfH] = formats[config.size];
             if(config.ori === 'l') [pdfW, pdfH] = [pdfH, pdfW];
 
-            const doc = new jsPDF({ orientation: config.ori, unit: 'mm', format: 'a6' });
+            const doc = new jsPDF({ orientation: config.ori, unit: 'mm', format: config.size });
             const margin = 5; 
             const iw = pdfW - (margin * 2);
-            const scale = 1.0; // Skala font tetap untuk A6
+            const scale = fontScales[config.size];
 
             const data = {
                 sender: document.getElementById('senderName').value.trim() || 'Label',
@@ -380,37 +418,33 @@
                 });
             }
 
-            const footerY = pdfH - margin - (3 * scale);
+            // Garis bawah penutup dan keterangan
+            currentY += (2 * scale);
+            doc.setLineWidth(0.15 * scale); 
+            doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
+            currentY += (5 * scale);
             doc.setFontSize(5 * scale);
-            doc.text(`RESI PRECISE A6 - ${new Date().toLocaleDateString('id-ID')}`, margin + (4 * scale), footerY);
+            doc.text(`RESI PRECISE - ${config.size.toUpperCase()} - ${new Date().toLocaleDateString('id-ID')}`, margin + (4 * scale), currentY);
 
-            doc.setLineWidth(0.1); 
-            doc.rect(margin, margin, iw, pdfH - (margin * 2));
+            // Kotak utama (Dynamic Height Border)
+            const boxHeight = currentY + (3 * scale) - margin;
+            doc.setLineWidth(0.25 * scale); 
+            doc.rect(margin, margin, iw, boxHeight);
 
             const fileName = `Resi_${data.receiver}.pdf`;
-            const pdfBlob = doc.output('blob');
-
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], fileName, { type: 'application/pdf' })] })) {
-                try {
-                    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-                    await navigator.share({
-                        files: [file],
-                        title: 'Label Pengiriman',
-                        text: `Label Resi untuk ${data.receiver}`
-                    });
-                } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        doc.save(fileName);
-                    }
-                }
-            } else {
+            if (mode === 'download') {
                 doc.save(fileName);
-                const msg = document.createElement('div');
-                msg.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full text-xs font-bold shadow-2xl z-50";
-                msg.innerText = "Browser tidak mendukung fitur bagikan. File otomatis diunduh.";
-                document.body.appendChild(msg);
-                setTimeout(() => msg.remove(), 3000);
+                showToast("Berhasil mengunduh PDF");
+                return;
             }
+
+            const pdfBlob = doc.output('blob');
+            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+            if (navigator.share) {
+                try {
+                    await navigator.share({ files: [file], title: 'Resi', text: 'Label Resi' });
+                } catch (e) { doc.save(fileName); }
+            } else { doc.save(fileName); }
         }
 
         renderItemInputs();
