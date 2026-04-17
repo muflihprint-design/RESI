@@ -174,7 +174,7 @@
     <script>
         const { jsPDF } = window.jspdf;
         let config = { size: 'a6', ori: 'p' };
-        let items = [{ name: 'Barang Contoh', qty: '1' }];
+        let items = [{ name: '', qty: '' }];
 
         const fontScales = {
             'a6': 1.1,
@@ -206,7 +206,7 @@
         }
 
         function addItem() {
-            items.push({ name: '', qty: '1' });
+            items.push({ name: '', qty: '' });
             renderItemInputs();
             updatePreview();
         }
