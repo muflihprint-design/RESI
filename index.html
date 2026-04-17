@@ -8,94 +8,80 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        
         body { 
             font-family: 'Inter', sans-serif; 
             touch-action: manipulation;
+            @apply bg-slate-50;
         }
         
         .preview-wrapper {
             width: 100%;
+            min-height: 600px;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 600px;
-            background: #e2e8f0;
+            background: #cbd5e1;
             border-radius: 1.5rem;
-            padding: 2rem;
+            padding: 3rem;
             overflow: hidden;
             position: relative;
+            border: 1px dashed #94a3b8;
         }
 
         #scaling-container {
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             transform-origin: center center;
             display: flex;
             justify-content: center;
             align-items: center;
+            will-change: transform;
         }
 
         .paper-border {
             background: white;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
             position: relative;
-            padding: 8px; 
+            padding: 12px; 
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
-            flex-shrink: 0;
-            justify-content: flex-start; 
+            height: auto;
+            min-height: fit-content;
         }
 
-        /* Dimensi Standar */
-        .p-a6 { width: 315px; height: 445px; }
-        .l-a6 { width: 445px; height: 315px; }
-        .p-a5 { width: 445px; height: 630px; }
-        .l-a5 { width: 630px; height: 445px; }
-        .p-a4 { width: 630px; height: 891px; }
-        .l-a4 { width: 891px; height: 630px; }
-
-        .paper-border::before {
-            content: "PRATINJAU AREA CETAK";
-            position: absolute;
-            top: -24px;
-            left: 0;
-            font-size: 9px;
-            font-weight: 900;
-            color: #64748b;
-            letter-spacing: 0.1em;
-        }
+        .p-a6 { width: 320px; min-height: 450px; } 
+        .l-a6 { width: 450px; min-height: 320px; }
+        .p-a5 { width: 450px; min-height: 635px; }
+        .l-a5 { width: 635px; min-height: 450px; }
+        .p-a4 { width: 635px; min-height: 900px; }
+        .l-a4 { width: 900px; min-height: 635px; }
 
         .preview-card {
             background: white;
-            border: 1px solid #000;
+            border: 1px solid #000; /* Border dikurangi dari 2px ke 1px */
             display: flex;
             flex-direction: column;
             height: auto;
             width: 100%;
             box-sizing: border-box;
-            position: relative;
+            overflow: visible;
         }
 
-        .content-wrapper {
-            padding: 0.75rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Skala Teks Preview */
         .p-a6, .l-a6 { font-size: 13px; }
-        .p-a5, .l-a5 { font-size: 20px; }
-        .p-a4, .l-a4 { font-size: 28px; }
+        .p-a5, .l-a5 { font-size: 19px; }
+        .p-a4, .l-a4 { font-size: 27px; }
 
-        #prevRecName { font-size: 1.5em; line-height: 1.1; margin-bottom: 2px; color: #000; font-weight: 900; }
-        #prevRecPhone { font-size: 1.1em; font-weight: 900; color: #000; margin-bottom: 2px; }
-        #prevRecAddress { font-size: 1.05em; line-height: 1.2; font-weight: 800; color: #000; }
-        .item-text { font-size: 0.9em; line-height: 1.2; color: #000; }
+        #prevRecName { font-size: 1.6em; line-height: 1.1; margin-bottom: 3px; font-weight: 900; }
+        #prevRecPhone { font-size: 1.15em; font-weight: 900; margin-bottom: 3px; }
+        #prevRecAddress { font-size: 1.05em; line-height: 1.2; font-weight: 800; }
+        .item-text { font-size: 0.95em; line-height: 1.3; }
 
         .active-btn {
             background-color: #2563eb !important;
             color: white !important;
             border-color: #1e40af !important;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
         }
     </style>
 </head>
@@ -157,9 +143,11 @@
                         </div>
                     </div>
 
-                    <button onclick="generatePDF()" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-[1.5rem] shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-3 active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                        CETAK LABEL PDF
+                    <button id="btnShare" onclick="generateAndSharePDF()" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-[1.5rem] shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-3 active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                        </svg>
+                        BAGIKAN PDF
                     </button>
                 </div>
             </div>
@@ -172,15 +160,13 @@
                             <div id="paper" class="paper-border p-a6">
                                 <div id="resiPreview" class="preview-card">
                                     <div class="content-wrapper">
-                                        <!-- Header Penerima -->
                                         <div class="mb-3 shrink-0">
                                             <div class="text-[0.55em] font-black text-black mb-0.5 uppercase">PENERIMA:</div>
                                             <div id="prevRecName" class="font-black uppercase"></div>
                                             <div id="prevRecPhone" class="mb-0.5"></div>
-                                            <div id="prevRecAddress" class="border-l-4 border-black pl-3 uppercase"></div>
+                                            <div id="prevRecAddress" class="border-l-2 border-black pl-3 uppercase"></div> <!-- Border alamat dikurangi ke l-2 -->
                                         </div>
 
-                                        <!-- Divider 1 -->
                                         <div class="pt-2 border-t border-dashed border-black shrink-0">
                                             <div class="text-[0.5em] font-black text-black uppercase">PENGIRIM:</div>
                                             <div class="flex flex-wrap items-baseline gap-x-2">
@@ -189,7 +175,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Divider 2 & Table -->
                                         <div id="prevTableArea" class="mt-4 border-t border-black pt-2 flex flex-col">
                                             <div class="text-[0.6em] font-black mb-1.5 uppercase tracking-tight text-black">Isi Paket:</div>
                                             <div class="scrollable-items">
@@ -200,7 +185,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Footer -->
                                     <div class="mt-auto border-t border-black px-3 py-2 flex justify-between items-center bg-white shrink-0">
                                         <div class="text-[0.55em] font-black text-black uppercase" id="prevSizeLabel">A6 Potret</div>
                                         <div id="currentDate" class="text-[0.55em] font-bold text-black"></div>
@@ -259,7 +243,7 @@
             const oriLabel = config.ori === 'p' ? 'Potret' : 'Lanskap';
             document.getElementById('prevSizeLabel').innerText = `${config.size.toUpperCase()} ${oriLabel}`;
             
-            adjustScale();
+            setTimeout(adjustScale, 10);
             updatePreview();
         }
 
@@ -337,7 +321,7 @@
             });
         }
 
-        function generatePDF() {
+        async function generateAndSharePDF() {
             const formats = { 'a6': [105, 148.5], 'a5': [148.5, 210], 'a4': [210, 297] };
             let [pdfW, pdfH] = formats[config.size];
             if(config.ori === 'l') [pdfW, pdfH] = [pdfH, pdfW];
@@ -348,9 +332,9 @@
             const scale = fontScales[config.size];
 
             const data = {
-                sender: document.getElementById('senderName').value.trim(),
+                sender: document.getElementById('senderName').value.trim() || 'Label',
                 senderPhone: document.getElementById('senderPhone').value.trim(),
-                receiver: document.getElementById('receiverName').value.trim(),
+                receiver: document.getElementById('receiverName').value.trim() || 'Label',
                 receiverPhone: document.getElementById('receiverPhone').value.trim(),
                 address: document.getElementById('receiverAddress').value.trim()
             };
@@ -376,17 +360,14 @@
             if (data.address) {
                 doc.setFontSize(10 * scale);
                 const splitAddr = doc.splitTextToSize(data.address.toUpperCase(), iw - (12 * scale));
-                
-                // Draw vertical line for address (lighter)
-                doc.setLineWidth(1 * scale);
+                doc.setLineWidth(0.5 * scale); // Mengurangi ketebalan garis alamat
                 doc.line(margin + (4 * scale), currentY - (3 * scale), margin + (4 * scale), currentY + (splitAddr.length * 4.5 * scale) - (3 * scale));
-                
                 doc.text(splitAddr, margin + (6 * scale), currentY);
                 currentY += (splitAddr.length * (4.5 * scale)) + (2 * scale);
             }
 
             currentY += (2 * scale);
-            doc.setLineWidth(0.3 * scale);
+            doc.setLineWidth(0.15 * scale); // Garis putus-putus lebih halus
             doc.setLineDashPattern([2, 1], 0);
             doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
             doc.setLineDashPattern([], 0);
@@ -403,7 +384,7 @@
             const validItems = items.filter(i => i.name.trim() !== "");
             if (validItems.length > 0) {
                 currentY += (2 * scale);
-                doc.setLineWidth(0.3 * scale);
+                doc.setLineWidth(0.15 * scale); // Garis isi paket lebih halus
                 doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
                 currentY += (6 * scale);
                 
@@ -425,10 +406,34 @@
             doc.setFontSize(5 * scale);
             doc.text(`RESI PRECISE - ${config.size.toUpperCase()} - ${new Date().toLocaleDateString('id-ID')}`, margin + (4 * scale), footerY);
 
-            // Border Luar (Tipis)
-            doc.setLineWidth(0.3);
+            // Garis luar PDF yang lebih tipis
+            doc.setLineWidth(0.1); 
             doc.rect(margin, margin, iw, pdfH - (margin * 2));
-            doc.save(`Resi_${data.receiver || 'Label'}.pdf`);
+
+            const fileName = `Resi_${data.receiver}.pdf`;
+            const pdfBlob = doc.output('blob');
+
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([pdfBlob], fileName, { type: 'application/pdf' })] })) {
+                try {
+                    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+                    await navigator.share({
+                        files: [file],
+                        title: 'Label Pengiriman',
+                        text: `Label Resi untuk ${data.receiver}`
+                    });
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        doc.save(fileName);
+                    }
+                }
+            } else {
+                doc.save(fileName);
+                const msg = document.createElement('div');
+                msg.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full text-xs font-bold shadow-2xl z-50";
+                msg.innerText = "Browser tidak mendukung fitur bagikan. File otomatis diunduh.";
+                document.body.appendChild(msg);
+                setTimeout(() => msg.remove(), 3000);
+            }
         }
 
         renderItemInputs();
