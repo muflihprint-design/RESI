@@ -323,19 +323,34 @@
         }
 
         function renderItemInputs() {
-            const container = document.getElementById('itemListContainer');
-            container.innerHTML = '';
-            items.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'flex gap-2 items-center';
-                div.innerHTML = `
-                    <input type="text" value="${item.name}" oninput="updateItem(${index}, 'name', this.value)" placeholder="Nama Barang" class="flex-1 p-2 bg-slate-50 rounded-lg text-xs outline-none">
-                    <input type="text" value="${item.qty}" oninput="updateItem(${index}, 'qty', this.value)" placeholder="Qty" class="w-15 p-2 bg-slate-50 rounded-lg text-xs text-center font-bold outline-none">
-                    <button onclick="removeItem(${index})" class="text-slate-300 hover:text-red-500 text-lg">&times;</button>
-                `;
-                container.appendChild(div);
-            });
-        }
+    const container = document.getElementById('itemListContainer');
+    container.innerHTML = '';
+    
+    items.forEach((item, index) => {
+        const div = document.createElement('div');
+        // 'flex' memastikan anak-anaknya (input) berada dalam satu baris
+        // 'w-full' memastikan container mengambil lebar maksimal
+        div.className = 'flex gap-2 items-center w-full mb-2'; 
+        
+        div.innerHTML = `
+            <input type="text" 
+                   value="${item.name}" 
+                   oninput="updateItem(${index}, 'name', this.value)" 
+                   placeholder="Nama Barang" 
+                   class="flex-1 min-w-0 p-2 bg-slate-50 rounded-lg text-xs outline-none focus:ring-1 focus:ring-blue-400">
+            
+            <input type="text" 
+                   value="${item.qty}" 
+                   oninput="updateItem(${index}, 'qty', this.value)" 
+                   placeholder="Qty" 
+                   class="w-20 p-2 bg-slate-50 rounded-lg text-xs text-center font-bold outline-none border-l border-slate-200">
+            
+            <button onclick="removeItem(${index})" 
+                    class="text-slate-300 hover:text-red-500 text-xl transition-colors">&times;</button>
+        `;
+        container.appendChild(div);
+    });
+}
 
         const basicInputs = ['senderName', 'senderPhone', 'receiverName', 'receiverPhone', 'receiverAddress', 'fontSizeScale'];
         basicInputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
@@ -470,7 +485,7 @@
     doc.setTextColor(0, 0, 0);
 
     // JARAK DIRAPATKAN: Dari 4 ke 3 agar item pertama dekat dengan judul "ISI PAKET"
-    currentY += (3 * baseScale); 
+    currentY += (5 * baseScale); 
     
     validItems.forEach(item => {
         doc.setFontSize(9 * baseScale);
