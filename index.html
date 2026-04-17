@@ -432,12 +432,12 @@
                     doc.text(item.name.toUpperCase(), margin + (4 * scale), currentY);
                     doc.setFont("helvetica", "bold");
                     doc.text(item.qty, pdfW - margin - (6 * scale), currentY, { align: 'right' });
-                    currentY += (5.5 * scale);
+                    currentY += (5.0 * scale);
                 });
             }
 
             // Garis bawah penutup dan keterangan
-            currentY += (2 * scale);
+            currentY += (0.5 * scale);
             doc.setLineWidth(0.15 * scale); 
             doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
             currentY += (5 * scale);
