@@ -17,13 +17,14 @@
         
         .preview-wrapper {
             width: 100%;
-            min-height: 600px;
+            height: calc(100vh - 150px); /* Menentukan tinggi tetap berdasarkan layar */
+            min-height: 500px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: #cbd5e1;
             border-radius: 1.5rem;
-            padding: 3rem;
+            padding: 1.5rem;
             overflow: hidden;
             position: relative;
             border: 1px dashed #94a3b8;
@@ -50,6 +51,7 @@
             min-height: fit-content;
         }
 
+        /* Ukuran Dasar Kertas untuk Perhitungan Skala */
         .p-a6 { width: 320px; min-height: 450px; } 
         .l-a6 { width: 450px; min-height: 320px; }
         .p-a5 { width: 450px; min-height: 635px; }
@@ -59,7 +61,7 @@
 
         .preview-card {
             background: white;
-            border: 1px solid #000; /* Border dikurangi dari 2px ke 1px */
+            border: 1px solid #000;
             display: flex;
             flex-direction: column;
             height: auto;
@@ -159,12 +161,12 @@
                         <div id="scaling-container">
                             <div id="paper" class="paper-border p-a6">
                                 <div id="resiPreview" class="preview-card">
-                                    <div class="content-wrapper">
+                                    <div class="content-wrapper p-4">
                                         <div class="mb-3 shrink-0">
                                             <div class="text-[0.55em] font-black text-black mb-0.5 uppercase">PENERIMA:</div>
                                             <div id="prevRecName" class="font-black uppercase"></div>
                                             <div id="prevRecPhone" class="mb-0.5"></div>
-                                            <div id="prevRecAddress" class="border-l-2 border-black pl-3 uppercase"></div> <!-- Border alamat dikurangi ke l-2 -->
+                                            <div id="prevRecAddress" class="border-l-2 border-black pl-3 uppercase"></div>
                                         </div>
 
                                         <div class="pt-2 border-t border-dashed border-black shrink-0">
@@ -252,14 +254,21 @@
             const paper = document.getElementById('paper');
             const scalingGroup = document.getElementById('scaling-container');
             
-            const contWidth = container.offsetWidth - 40;
-            const contHeight = container.offsetHeight - 40;
+            // Memberikan padding aman agar kertas tidak menempel ke batas kontainer
+            const safePadding = 40;
+            const contWidth = container.offsetWidth - safePadding;
+            const contHeight = container.offsetHeight - safePadding;
+            
             const paperWidth = paper.offsetWidth;
             const paperHeight = paper.offsetHeight;
 
+            // Logika baru: Prioritaskan agar tinggi kertas pas dengan tinggi kontainer (Fit-to-Height)
+            // Namun tetap memastikan lebar tidak melebihi kontainer
             const scaleX = contWidth / paperWidth;
             const scaleY = contHeight / paperHeight;
-            const finalScale = Math.min(scaleX, scaleY, 1);
+            
+            // Gunakan skala terkecil di antara lebar dan tinggi untuk memastikan seluruh kertas terlihat
+            const finalScale = Math.min(scaleX, scaleY);
 
             scalingGroup.style.transform = `scale(${finalScale})`;
         }
@@ -319,6 +328,9 @@
                 tr.innerHTML = `<td class="py-0.5 item-text text-black uppercase font-medium">${item.name}</td><td class="text-right py-0.5 font-black item-text text-black">${item.qty}</td>`;
                 tableBody.appendChild(tr);
             });
+            
+            // Sesuaikan skala kembali jika konten berubah
+            setTimeout(adjustScale, 10);
         }
 
         async function generateAndSharePDF() {
@@ -360,14 +372,14 @@
             if (data.address) {
                 doc.setFontSize(10 * scale);
                 const splitAddr = doc.splitTextToSize(data.address.toUpperCase(), iw - (12 * scale));
-                doc.setLineWidth(0.5 * scale); // Mengurangi ketebalan garis alamat
+                doc.setLineWidth(0.5 * scale); 
                 doc.line(margin + (4 * scale), currentY - (3 * scale), margin + (4 * scale), currentY + (splitAddr.length * 4.5 * scale) - (3 * scale));
                 doc.text(splitAddr, margin + (6 * scale), currentY);
                 currentY += (splitAddr.length * (4.5 * scale)) + (2 * scale);
             }
 
             currentY += (2 * scale);
-            doc.setLineWidth(0.15 * scale); // Garis putus-putus lebih halus
+            doc.setLineWidth(0.15 * scale); 
             doc.setLineDashPattern([2, 1], 0);
             doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
             doc.setLineDashPattern([], 0);
@@ -384,7 +396,7 @@
             const validItems = items.filter(i => i.name.trim() !== "");
             if (validItems.length > 0) {
                 currentY += (2 * scale);
-                doc.setLineWidth(0.15 * scale); // Garis isi paket lebih halus
+                doc.setLineWidth(0.15 * scale); 
                 doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
                 currentY += (6 * scale);
                 
@@ -406,7 +418,6 @@
             doc.setFontSize(5 * scale);
             doc.text(`RESI PRECISE - ${config.size.toUpperCase()} - ${new Date().toLocaleDateString('id-ID')}`, margin + (4 * scale), footerY);
 
-            // Garis luar PDF yang lebih tipis
             doc.setLineWidth(0.1); 
             doc.rect(margin, margin, iw, pdfH - (margin * 2));
 
