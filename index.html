@@ -397,15 +397,15 @@
                 doc.setLineWidth(0.5 * scale); 
                 doc.line(margin + (4 * scale), currentY - (3 * scale), margin + (4 * scale), currentY + (splitAddr.length * 4.5 * scale) - (3 * scale));
                 doc.text(splitAddr, margin + (6 * scale), currentY);
-                currentY += (splitAddr.length * (4.5 * scale)) + (2 * scale);
+                currentY += (splitAddr.length * (4.5 * scale)) + (0.5 * scale);
             }
 
-            currentY += (2 * scale);
+            currentY += (0.5 * scale);
             doc.setLineWidth(0.15 * scale); 
             doc.setLineDashPattern([2, 1], 0);
             doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
             doc.setLineDashPattern([], 0);
-            currentY += (6 * scale);
+            currentY += (3 * scale);
 
             doc.setFontSize(6 * scale);
             doc.text("PENGIRIM:", margin + (4 * scale), currentY);
@@ -413,18 +413,18 @@
 
             doc.setFontSize(8.5 * scale);
             doc.text(`${data.sender.toUpperCase()} ${data.senderPhone ? '| '+data.senderPhone : ''}`, margin + (4 * scale), currentY);
-            currentY += (6 * scale);
+            currentY += (3 * scale);
 
             const validItems = items.filter(i => i.name.trim() !== "");
             if (validItems.length > 0) {
-                currentY += (2 * scale);
+                currentY += (0.5 * scale);
                 doc.setLineWidth(0.15 * scale); 
                 doc.line(margin + (4 * scale), currentY, pdfW - margin - (4 * scale), currentY);
-                currentY += (6 * scale);
+                currentY += (3 * scale);
                 
                 doc.setFontSize(6.5 * scale);
                 doc.text("ISI PAKET:", margin + (4 * scale), currentY);
-                currentY += (5 * scale);
+                currentY += (4 * scale);
                 
                 validItems.forEach(item => {
                     doc.setFontSize(9 * scale);
