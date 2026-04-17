@@ -348,9 +348,9 @@
             const recPhone = document.getElementById('prevRecPhone');
             const recAddr = document.getElementById('prevRecAddress');
 
-            recName.style.fontSize = `${userScale * 1.2}em`;
-            recPhone.style.fontSize = `${userScale * 0.85}em`;
-            recAddr.style.fontSize = `${userScale * 0.75}em`;
+            recName.style.fontSize = `${userScale * 1.8}em`;
+            recPhone.style.fontSize = `${userScale * 1.1}em`;
+            recAddr.style.fontSize = `${userScale * 0.9}em`;
 
             recName.innerText = document.getElementById('receiverName').value || 'NAMA PENERIMA';
             recPhone.innerText = document.getElementById('receiverPhone').value;
@@ -403,7 +403,7 @@
 
             // Nama Penerima
             if (data.receiver) {
-                const fontSize = 14 * userScale * baseScale;
+                const fontSize = 18 * userScale * baseScale;
                 doc.setFontSize(fontSize);
                 const splitName = doc.splitTextToSize(data.receiver.toUpperCase(), iw - (8 * baseScale));
                 // Hitung posisi Y agar teks nama tidak memotong label "PENERIMA"
@@ -414,7 +414,7 @@
 
             // Phone
             if (data.receiverPhone) {
-                const fontSize = 10 * userScale * baseScale;
+                const fontSize = 13 * userScale * baseScale;
                 doc.setFontSize(fontSize);
                 doc.text(data.receiverPhone, margin + (4 * baseScale), currentY);
                 currentY += (fontSize * 0.45);
@@ -422,7 +422,7 @@
 
             // Alamat
             if (data.address) {
-                const fontSize = 9 * userScale * baseScale;
+                const fontSize = 11 * userScale * baseScale;
                 doc.setFontSize(fontSize);
                 const splitAddr = doc.splitTextToSize(data.address.toUpperCase(), iw - (12 * baseScale));
                 
