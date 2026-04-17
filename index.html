@@ -28,7 +28,6 @@
         .preview-card {
             background: white;
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            /* Border preview visual dibuat lebih tipis */
             border: 1px solid black;
             flex-shrink: 0;
             display: block; 
@@ -42,7 +41,7 @@
         .p-a5, .l-a5 { width: 500px; font-size: 20px; }
         .p-a4, .l-a4 { width: 650px; font-size: 26px; }
 
-        /* Skala Font Preview Berdasarkan Ukuran */
+        /* Skala Font Preview */
         #prevRecName { font-size: 1.5rem; }
         .p-a5 #prevRecName, .l-a5 #prevRecName { font-size: 2rem; }
         .p-a4 #prevRecName, .l-a4 #prevRecName { font-size: 2.8rem; }
@@ -73,6 +72,7 @@
             <div class="lg:col-span-5 order-1">
                 <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-200">
                     <div class="space-y-6">
+                        <!-- Pengaturan Ukuran & Orientasi -->
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Ukuran Cetak</label>
@@ -92,19 +92,31 @@
                         </div>
 
                         <div class="space-y-4">
+                            <!-- Input Penerima -->
                             <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100 space-y-2">
                                 <h3 class="text-[10px] font-black text-blue-500 uppercase">Penerima</h3>
                                 <input type="text" id="receiverName" placeholder="Nama Penerima" class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
                                 <input type="tel" id="receiverPhone" placeholder="No. HP Penerima" class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
                                 <textarea id="receiverAddress" rows="2" placeholder="Alamat Lengkap Penerima..." class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                             </div>
-                            <div class="p-4 bg-gray-50 rounded-xl space-y-2">
-                                <h3 class="text-[10px] font-black text-gray-400 uppercase">Pengirim</h3>
-                                <input type="text" id="senderName" placeholder="Nama Toko/Pengirim" class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="tel" id="senderPhone" placeholder="No. HP / Alamat Pengirim (Ringkas)" class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+
+                            <!-- Input Pengirim dengan Auto-fill -->
+                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Pengirim</h3>
+                                    <div class="flex gap-1">
+                                        <button onclick="quickFill(1)" class="bg-gray-200 hover:bg-gray-300 text-[9px] font-bold px-2 py-1 rounded transition-colors">MUFLIH</button>
+                                        <button onclick="quickFill(2)" class="bg-gray-200 hover:bg-gray-300 text-[9px] font-bold px-2 py-1 rounded transition-colors">VI PRINT</button>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <input type="text" id="senderName" placeholder="Nama Toko/Pengirim" class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                                    <input type="tel" id="senderPhone" placeholder="No. HP / Alamat Ringkas" class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Daftar Barang -->
                         <div class="p-4 bg-yellow-50/50 rounded-xl border border-yellow-100">
                             <h3 class="text-[10px] font-black text-yellow-600 uppercase mb-3 flex justify-between">
                                 Daftar Barang
@@ -113,6 +125,7 @@
                             <div id="itemListContainer" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
                         </div>
 
+                        <!-- Tombol Aksi -->
                         <button onclick="generatePDF()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -123,14 +136,14 @@
                 </div>
             </div>
 
-            <!-- Preview -->
+            <!-- Preview Visual -->
             <div class="lg:col-span-7 order-2">
                 <div class="lg:sticky lg:top-8 mb-10">
                     <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 text-center">Tampilan Hasil Akhir</h2>
                     <div class="preview-container shadow-inner">
                         <div id="resiPreview" class="preview-card p-a6 p-5">
                             <div class="flex flex-col h-full">
-                                <!-- PENERIMA (ATAS) -->
+                                <!-- PENERIMA -->
                                 <div id="prevRecCol" class="mb-4">
                                     <div id="lblKe" class="text-[0.6em] font-black text-blue-500 mb-1">KEPADA:</div>
                                     <div id="prevRecName" class="font-black text-gray-900 leading-none mb-1"></div>
@@ -147,10 +160,11 @@
                                     </div>
                                 </div>
 
+                                <!-- TABEL BARANG -->
                                 <div id="prevTableArea" class="mt-4 border-t border-black pt-2 hidden">
                                     <div class="text-[0.75em] font-black mb-1 uppercase">Daftar Isi Paket:</div>
                                     <table class="w-full border-collapse">
-                                        <thead class="border-b border-gray-400">
+                                        <thead class="border-b border-gray-300">
                                             <tr>
                                                 <th class="text-left py-1 text-[0.85em]">Nama Barang</th>
                                                 <th class="text-right py-1 text-[0.85em]">Qty</th>
@@ -160,6 +174,7 @@
                                     </table>
                                 </div>
 
+                                <!-- FOOTER PREVIEW -->
                                 <div id="footerRapat" class="border-t border-black pt-2 mt-auto flex justify-between items-end">
                                     <div class="text-[0.7em] font-black text-gray-300 uppercase" id="prevSizeLabel">A6</div>
                                     <div id="currentDate" class="text-[0.7em] font-bold text-right text-gray-400"></div>
@@ -182,6 +197,25 @@
             'a5': 1.6,
             'a4': 2.3
         };
+
+        // Data Otomatis Pengirim
+        const quickData = {
+            1: { 
+                name: "MUFLIH PRINT", 
+                contact: "081574009621 | Jl. Barawaja No. 19, Makassar" 
+            },
+            2: { 
+                name: "VI PRINTING", 
+                contact: "085823253354 | Jl. Rappokalling Lr. Kami" 
+            }
+        };
+
+        function quickFill(type) {
+            const data = quickData[type];
+            document.getElementById('senderName').value = data.name;
+            document.getElementById('senderPhone').value = data.contact;
+            updatePreview();
+        }
 
         function setSize(s) {
             config.size = s;
@@ -274,7 +308,7 @@
             
             validItems.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = 'border-b border-gray-100';
+                tr.className = 'border-b border-gray-50';
                 tr.innerHTML = `<td class="py-1 font-bold item-text">${item.name}</td><td class="text-right py-1 font-bold item-text">${item.qty}</td>`;
                 tableBody.appendChild(tr);
             });
@@ -316,7 +350,6 @@
                     currentY += (splitName.length * (7 * scale));
                 }
                 
-                doc.setFont("helvetica", "bold");
                 if (data.receiverPhone) {
                     doc.setFontSize(12 * scale);
                     doc.text(data.receiverPhone, margin + (5 * scale), currentY);
@@ -333,14 +366,13 @@
             // --- DARI ---
             if (data.sender || data.senderPhone) {
                 currentY += (2 * scale);
-                doc.setDrawColor(200); // Garis pemisah lebih muda
-                doc.setLineWidth(0.15); // Border tipis
+                doc.setDrawColor(200);
+                doc.setLineWidth(0.15);
                 doc.setLineDashPattern([1, 1], 0);
                 doc.line(margin + (5 * scale), currentY, pdfW - margin - (5 * scale), currentY);
                 doc.setLineDashPattern([], 0);
                 currentY += (5 * scale);
 
-                doc.setFont("helvetica", "bold");
                 doc.setFontSize(7 * scale);
                 doc.setTextColor(150, 150, 150);
                 doc.text("DARI:", margin + (5 * scale), currentY);
@@ -361,11 +393,10 @@
             if (validItems.length > 0) {
                 currentY += (2 * scale);
                 doc.setDrawColor(0);
-                doc.setLineWidth(0.2); // Border tabel tipis
+                doc.setLineWidth(0.2);
                 doc.line(margin + (5 * scale), currentY, pdfW - margin - (5 * scale), currentY);
                 currentY += (5 * scale);
                 
-                doc.setFont("helvetica", "bold");
                 doc.setFontSize(8 * scale);
                 doc.setTextColor(0, 0, 0);
                 doc.text("DAFTAR ISI PAKET:", margin + (5 * scale), currentY);
@@ -374,7 +405,6 @@
                 
                 currentY += (8 * scale);
                 validItems.forEach(item => {
-                    doc.setFont("helvetica", "bold");
                     doc.setFontSize(11 * scale); 
                     const splitItem = doc.splitTextToSize(item.name, iw - (25 * scale));
                     doc.text(splitItem, margin + (5 * scale), currentY);
@@ -385,13 +415,11 @@
 
             // --- FOOTER ---
             currentY += (3 * scale);
-            doc.setLineWidth(0.2); // Garis footer tipis
-            doc.setDrawColor(0);
+            doc.setLineWidth(0.2);
             doc.line(margin + (5 * scale), currentY, pdfW - margin - (5 * scale), currentY);
             currentY += (5 * scale);
             
             doc.setFontSize(8 * scale);
-            doc.setFont("helvetica", "bold");
             doc.setTextColor(200, 200, 200);
             doc.text(config.size.toUpperCase(), margin + (5 * scale), currentY);
             
@@ -399,13 +427,12 @@
             const tgl = new Date().toLocaleDateString('id-ID');
             doc.text(tgl, pdfW - margin - (5 * scale), currentY, { align: 'right' });
 
-            // BORDER LUAR (DIPERTIPIS)
+            // BORDER LUAR
             const finalH = currentY + (6 * scale);
-            doc.setLineWidth(0.3); // Border luar dari 1.0 menjadi 0.3 agar tidak terlalu kaku
-            doc.setDrawColor(0);
+            doc.setLineWidth(0.3);
             doc.rect(margin, margin, iw, finalH - margin);
 
-            doc.save(`Resi_Kompak_${config.size.toUpperCase()}.pdf`);
+            doc.save(`Resi_${data.receiver || 'Label'}_${config.size.toUpperCase()}.pdf`);
         }
 
         renderItemInputs();
