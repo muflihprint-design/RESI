@@ -152,8 +152,8 @@
                     </div>
 
                     <div class="flex gap-3 mt-8">
-                        <button onclick="generateAndSharePDF('download')" class="custom-btn bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm">
-                            UNDUH PDF
+                        <button onclick="generateAndSharePDF('print')" class="custom-btn bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm">
+                             CETAK LANGSUNG
                         </button>
                         <button onclick="generateAndSharePDF('share')" class="custom-btn bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-100">
                             BAGIKAN
@@ -432,6 +432,13 @@
             doc.rect(margin, margin, iw, boxHeight);
 
             const fileName = `Resi_${data.receiver}.pdf`;
+
+            if (mode === 'print') {
+                doc.autoPrint();
+                window.open(doc.output('bloburl'), '_blank');
+                return;
+            }
+
             if (mode === 'download') {
                 doc.save(fileName);
                 showToast("Berhasil mengunduh PDF");
