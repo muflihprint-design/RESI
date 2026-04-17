@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Generator Resi Pro - Skala Otomatis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Library untuk PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            touch-action: manipulation;
+        }
+        
+        .preview-container {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-x: auto;
+            min-height: 500px;
+        }
+
+        .preview-card {
+            background: white;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            border: 2px solid black;
+            flex-shrink: 0;
+            display: block; 
+            height: auto !important; 
+            min-height: 100px;
+            transition: all 0.3s ease;
+        }
+
+        /* Ukuran Preview Visual */
+        .p-a6, .l-a6 { width: 350px; font-size: 16px; }
+        .p-a5, .l-a5 { width: 500px; font-size: 20px; }
+        .p-a4, .l-a4 { width: 650px; font-size: 26px; }
+
+        /* Skala Font Preview Berdasarkan Ukuran */
+        #prevRecName { font-size: 1.5rem; }
+        .p-a5 #prevRecName, .l-a5 #prevRecName { font-size: 2rem; }
+        .p-a4 #prevRecName, .l-a4 #prevRecName { font-size: 2.8rem; }
+        
+        .item-text { font-size: 1.1rem; }
+        .p-a5 .item-text, .l-a5 .item-text { font-size: 1.4rem; }
+        .p-a4 .item-text, .l-a4 .item-text { font-size: 1.8rem; }
+
+        .active-btn {
+            border-color: #2563eb !important;
+            background-color: #eff6ff !important;
+            color: #1d4ed8 !important;
+        }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="max-w-6xl mx-auto p-4 md:p-8">
+        <header class="mb-6 text-center">
+            <h1 class="text-2xl md:text-3xl font-black text-blue-700 uppercase tracking-tight">Resi Generator Pro</h1>
+            <p class="text-xs md:text-sm text-gray-500 font-medium">Manajemen Daftar Barang & Label Pengiriman</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Form Input -->
+            <div class="lg:col-span-5 order-1">
+                <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Ukuran Cetak</label>
+                                <div class="grid grid-cols-3 gap-1">
+                                    <button onclick="setSize('a6')" id="btn-a6" class="size-btn py-2 rounded-lg border-2 border-gray-100 text-[10px] font-bold active-btn">A6</button>
+                                    <button onclick="setSize('a5')" id="btn-a5" class="size-btn py-2 rounded-lg border-2 border-gray-100 text-[10px] font-bold">A5</button>
+                                    <button onclick="setSize('a4')" id="btn-a4" class="size-btn py-2 rounded-lg border-2 border-gray-100 text-[10px] font-bold">A4</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase mb-2">Orientasi</label>
+                                <div class="grid grid-cols-2 gap-1">
+                                    <button onclick="setOrientation('p')" id="btn-p" class="ori-btn py-2 rounded-lg border-2 border-gray-100 text-[10px] font-bold active-btn">Tegak</button>
+                                    <button onclick="setOrientation('l')" id="btn-l" class="ori-btn py-2 rounded-lg border-2 border-gray-100 text-[10px] font-bold">Mendatar</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100 space-y-2">
+                                <h3 class="text-[10px] font-black text-blue-500 uppercase">Penerima</h3>
+                                <input type="text" id="receiverName" placeholder="Nama Penerima" class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="tel" id="receiverPhone" placeholder="No. HP Penerima" class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                                <textarea id="receiverAddress" rows="2" placeholder="Alamat Lengkap Penerima..." class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-xl space-y-2">
+                                <h3 class="text-[10px] font-black text-gray-400 uppercase">Pengirim</h3>
+                                <input type="text" id="senderName" placeholder="Nama Toko/Pengirim" class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="tel" id="senderPhone" placeholder="No. HP / Alamat Pengirim (Ringkas)" class="w-full p-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-yellow-50/50 rounded-xl border border-yellow-100">
+                            <h3 class="text-[10px] font-black text-yellow-600 uppercase mb-3 flex justify-between">
+                                Daftar Barang
+                                <button onclick="addItem()" class="bg-yellow-500 text-white px-2 py-0.5 rounded text-[9px] hover:bg-yellow-600">+ Tambah</button>
+                            </h3>
+                            <div id="itemListContainer" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
+                        </div>
+
+                        <button onclick="generatePDF()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center justify-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            UNDUH LABEL PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview -->
+            <div class="lg:col-span-7 order-2">
+                <div class="lg:sticky lg:top-8 mb-10">
+                    <h2 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 text-center">Tampilan Hasil Akhir</h2>
+                    <div class="preview-container shadow-inner">
+                        <div id="resiPreview" class="preview-card p-a6 p-5">
+                            <div class="flex flex-col h-full">
+                                <!-- PENERIMA (ATAS) -->
+                                <div id="prevRecCol" class="mb-4">
+                                    <div id="lblKe" class="text-[0.6em] font-black text-blue-500 mb-1">KEPADA:</div>
+                                    <div id="prevRecName" class="font-black text-gray-900 leading-none mb-1"></div>
+                                    <div id="prevRecPhone" class="text-[0.9em] font-black text-gray-900 mb-1"></div>
+                                    <div id="prevRecAddress" class="text-[0.85em] leading-tight font-black text-gray-900"></div>
+                                </div>
+
+                                <!-- PENGIRIM (BAWAH PENERIMA - LEBIH KECIL) -->
+                                <div id="prevSendCol" class="pt-2 border-t border-dashed border-gray-300">
+                                    <div id="lblDari" class="text-[0.55em] font-black text-gray-400">DARI:</div>
+                                    <div class="flex flex-wrap items-baseline gap-x-2">
+                                        <div id="prevSendName" class="text-[0.8em] font-bold text-gray-700"></div>
+                                        <div id="prevSendPhone" class="text-[0.7em] text-gray-500 italic"></div>
+                                    </div>
+                                </div>
+
+                                <div id="prevTableArea" class="mt-4 border-t-2 border-black pt-2 hidden">
+                                    <div class="text-[0.75em] font-black mb-1 uppercase">Daftar Isi Paket:</div>
+                                    <table class="w-full border-collapse">
+                                        <thead class="border-b border-black">
+                                            <tr>
+                                                <th class="text-left py-1 text-[0.85em]">Nama Barang</th>
+                                                <th class="text-right py-1 text-[0.85em]">Qty</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="prevItemsTable"></tbody>
+                                    </table>
+                                </div>
+
+                                <div id="footerRapat" class="border-t-2 border-black pt-2 mt-auto flex justify-between items-end">
+                                    <div class="text-[0.7em] font-black text-gray-300 uppercase" id="prevSizeLabel">A6</div>
+                                    <div id="currentDate" class="text-[0.7em] font-bold text-right text-gray-400"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { jsPDF } = window.jspdf;
+        let config = { size: 'a6', ori: 'p' };
+        let items = [{ name: 'Barang Contoh', qty: '1' }];
+
+        const fontScales = {
+            'a6': 1.1,
+            'a5': 1.6,
+            'a4': 2.3
+        };
+
+        function setSize(s) {
+            config.size = s;
+            updateUI();
+            updatePreview();
+        }
+
+        function setOrientation(o) {
+            config.ori = o;
+            updateUI();
+            updatePreview();
+        }
+
+        function updateUI() {
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active-btn'));
+            document.querySelectorAll('.ori-btn').forEach(b => b.classList.remove('active-btn'));
+            document.getElementById(`btn-${config.size}`).classList.add('active-btn');
+            document.getElementById(`btn-${config.ori}`).classList.add('active-btn');
+
+            const card = document.getElementById('resiPreview');
+            card.className = `preview-card ${config.ori}-${config.size} p-5`;
+            document.getElementById('prevSizeLabel').innerText = config.size.toUpperCase();
+        }
+
+        function addItem() {
+            items.push({ name: '', qty: '1' });
+            renderItemInputs();
+            updatePreview();
+        }
+
+        function removeItem(index) {
+            items.splice(index, 1);
+            renderItemInputs();
+            updatePreview();
+        }
+
+        function updateItem(index, field, value) {
+            items[index][field] = value;
+            updatePreview();
+        }
+
+        function renderItemInputs() {
+            const container = document.getElementById('itemListContainer');
+            container.innerHTML = '';
+            items.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex gap-2 items-center';
+                div.innerHTML = `
+                    <input type="text" value="${item.name}" oninput="updateItem(${index}, 'name', this.value)" placeholder="Nama Barang" class="flex-1 p-2 border rounded-lg text-xs outline-none">
+                    <input type="text" value="${item.qty}" oninput="updateItem(${index}, 'qty', this.value)" placeholder="Qty" class="w-12 p-2 border rounded-lg text-xs text-center outline-none">
+                    <button onclick="removeItem(${index})" class="text-red-400 hover:text-red-600 p-1">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"></path></svg>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        const basicInputs = ['senderName', 'senderPhone', 'receiverName', 'receiverPhone', 'receiverAddress'];
+        basicInputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
+
+        function updatePreview() {
+            const rName = document.getElementById('receiverName').value;
+            const rPhone = document.getElementById('receiverPhone').value;
+            const rAddr = document.getElementById('receiverAddress').value;
+            const sName = document.getElementById('senderName').value;
+            const sPhone = document.getElementById('senderPhone').value;
+
+            document.getElementById('lblKe').style.display = (rName || rPhone || rAddr) ? 'block' : 'none';
+            document.getElementById('prevRecName').innerText = rName;
+            document.getElementById('prevRecName').style.display = rName ? 'block' : 'none';
+            document.getElementById('prevRecPhone').innerText = rPhone;
+            document.getElementById('prevRecPhone').style.display = rPhone ? 'block' : 'none';
+            document.getElementById('prevRecAddress').innerText = rAddr;
+            document.getElementById('prevRecAddress').style.display = rAddr ? 'block' : 'none';
+            
+            document.getElementById('lblDari').style.display = (sName || sPhone) ? 'block' : 'none';
+            document.getElementById('prevSendName').innerText = sName;
+            document.getElementById('prevSendName').style.display = sName ? 'block' : 'none';
+            document.getElementById('prevSendPhone').innerText = sPhone ? `| ${sPhone}` : '';
+            document.getElementById('prevSendPhone').style.display = sPhone ? 'inline' : 'none';
+
+            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID');
+
+            const tableBody = document.getElementById('prevItemsTable');
+            tableBody.innerHTML = '';
+            const validItems = items.filter(i => i.name.trim() !== "");
+            
+            document.getElementById('prevTableArea').style.display = validItems.length > 0 ? 'block' : 'none';
+            
+            validItems.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100';
+                tr.innerHTML = `<td class="py-1 font-bold item-text">${item.name}</td><td class="text-right py-1 font-bold item-text">${item.qty}</td>`;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function generatePDF() {
+            const formats = { 'a6': [105, 148.5], 'a5': [148.5, 210], 'a4': [210, 297] };
+            let [pdfW, pdfH] = formats[config.size];
+            if(config.ori === 'l') [pdfW, pdfH] = [pdfH, pdfW];
+
+            const doc = new jsPDF({ orientation: config.ori, unit: 'mm', format: config.size });
+            const margin = 5; 
+            const iw = pdfW - (margin * 2);
+            const scale = fontScales[config.size];
+
+            const data = {
+                sender: document.getElementById('senderName').value.trim(),
+                senderPhone: document.getElementById('senderPhone').value.trim(),
+                receiver: document.getElementById('receiverName').value.trim(),
+                receiverPhone: document.getElementById('receiverPhone').value.trim(),
+                address: document.getElementById('receiverAddress').value.trim()
+            };
+
+            let currentY = margin + (8 * scale);
+
+            // --- KEPADA (BAGIAN UTAMA) ---
+            if (data.receiver || data.receiverPhone || data.address) {
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(8 * scale);
+                doc.setTextColor(59, 130, 246);
+                doc.text("KEPADA:", margin + (5 * scale), currentY);
+                currentY += (5 * scale);
+
+                doc.setTextColor(0, 0, 0);
+                if (data.receiver) {
+                    doc.setFontSize(16 * scale); 
+                    const splitName = doc.splitTextToSize(data.receiver, iw - (10 * scale));
+                    doc.text(splitName, margin + (5 * scale), currentY);
+                    currentY += (splitName.length * (7 * scale));
+                }
+                
+                // Set font ke BOLD untuk No HP & Alamat
+                doc.setFont("helvetica", "bold");
+                
+                if (data.receiverPhone) {
+                    doc.setFontSize(12 * scale);
+                    doc.text(data.receiverPhone, margin + (5 * scale), currentY);
+                    currentY += (6 * scale);
+                }
+                if (data.address) {
+                    doc.setFontSize(10 * scale);
+                    const splitAddr = doc.splitTextToSize(data.address, iw - (10 * scale));
+                    doc.text(splitAddr, margin + (5 * scale), currentY);
+                    currentY += (splitAddr.length * (4.5 * scale)) + (2 * scale);
+                }
+            }
+
+            // --- DARI (SETELAH KEPADA - LEBIH KECIL & RINGKAS) ---
+            if (data.sender || data.senderPhone) {
+                currentY += (2 * scale);
+                doc.setDrawColor(220);
+                doc.setLineDashPattern([1, 1], 0);
+                doc.line(margin + (5 * scale), currentY, pdfW - margin - (5 * scale), currentY);
+                doc.setLineDashPattern([], 0);
+                currentY += (5 * scale);
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(7 * scale);
+                doc.setTextColor(150, 150, 150);
+                doc.text("DARI:", margin + (5 * scale), currentY);
+                currentY += (4 * scale);
+
+                doc.setTextColor(80, 80, 80);
+                doc.setFontSize(9 * scale);
+                let senderLine = data.sender;
+                if (data.senderPhone) senderLine += ` | ${data.senderPhone}`;
+                
+                const splitSender = doc.splitTextToSize(senderLine, iw - (10 * scale));
+                doc.text(splitSender, margin + (5 * scale), currentY);
+                currentY += (splitSender.length * (4 * scale)) + (2 * scale);
+            }
+
+            // --- DAFTAR BARANG ---
+            const validItems = items.filter(i => i.name.trim() !== "");
+            if (validItems.length > 0) {
+                currentY += (2 * scale);
+                doc.setDrawColor(0);
+                doc.setLineWidth(0.6);
+                doc.line(margin + (5 * scale), currentY, pdfW - margin - (5 * scale), currentY);
+                currentY += (5 * scale);
+                
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(8 * scale);
+                doc.setTextColor(0, 0, 0);
+                doc.text("DAFTAR ISI PAKET:", margin + (5 * scale), currentY);
+                currentY += (4 * scale);
+                doc.line(margin + (5 * scale), currentY, pdfW - margin - (5 * scale), currentY);
+                
+                currentY += (8 * scale);
+                validItems.forEach(item => {
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(12 * scale); 
+                    const splitItem = doc.splitTextToSize(item.name, iw - (25 * scale));
+                    doc.text(splitItem, margin + (5 * scale), currentY);
+                    doc.text(item.qty, pdfW - margin - (8 * scale), currentY, { align: 'right' });
+                    currentY += (splitItem.length * (7 * scale));
+                });
+            }
+
+            // --- FOOTER ---
+            currentY += (3 * scale);
+            doc.setLineWidth(0.6);
+            doc.setDrawColor(0);
+            doc.line(margin + (5 * scale), currentY, pdfW - margin - (5 * scale), currentY);
+            currentY += (5 * scale);
+            
+            doc.setFontSize(8 * scale);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(200, 200, 200);
+            doc.text(config.size.toUpperCase(), margin + (5 * scale), currentY);
+            
+            doc.setTextColor(150, 150, 150);
+            const tgl = new Date().toLocaleDateString('id-ID');
+            doc.text(tgl, pdfW - margin - (5 * scale), currentY, { align: 'right' });
+
+            // BORDER LUAR TEBAL
+            const finalH = currentY + (6 * scale);
+            doc.setLineWidth(1.0);
+            doc.setDrawColor(0);
+            doc.rect(margin, margin, iw, finalH - margin);
+
+            doc.save(`Resi_Kompak_${config.size.toUpperCase()}.pdf`);
+        }
+
+        renderItemInputs();
+        updatePreview();
+    </script>
+</body>
+</html>
